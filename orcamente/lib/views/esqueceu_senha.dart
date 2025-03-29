@@ -9,6 +9,7 @@ class _EsqueceuSenhaPageState extends State<EsqueceuSenhaPage> {
   final TextEditingController _emailController = TextEditingController();
 
   void _recuperarSenha() {
+    // adicionar logica para buscar no banco se existe email 
     print("recuperação de senha.");
    
   }
