@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoginController {
+class LoginController extends ChangeNotifier {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   String errorMessage = '';
@@ -17,11 +17,13 @@ class LoginController {
 
     if (email.isEmpty || password.isEmpty) {
       errorMessage = 'Por favor, preencha todos os campos.';
+      notifyListeners();
       return false;
     }
 
     if (!_isValidEmail(email)) {
       errorMessage = 'Email inválido.';
+      notifyListeners();
       return false;
     }
 
@@ -30,11 +32,17 @@ class LoginController {
       return true;
     } else {
       errorMessage = 'Email ou senha incorretos.';
+      notifyListeners(); 
       return false;
     }
   }
 
   bool _isValidEmail(String email) {
     return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(email);
+  }
+
+  void clearErrorMessage() {
+    errorMessage = '';
+    notifyListeners(); 
   }
 }

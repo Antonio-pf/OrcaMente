@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:orcamente/views/esqueceu_senha.dart';
+import 'package:orcamente/views/forget_password.dart';
 import 'package:orcamente/views/login_page.dart';
-import 'package:orcamente/views/cadastro_page.dart'; 
+import 'package:orcamente/views/register_page.dart'; 
 
 void main() {
   runApp(
@@ -23,11 +23,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: LoginPage(),
       builder: DevicePreview.appBuilder,
       routes: {
         '/register': (context) => CadastroPage(),
-        '/forget-password': (context) => EsqueceuSenhaPage(), 
+        '/forget-password': (context) => ForgetPasswordPage(), 
       },
     );
   }
