@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ForgetPasswordController extends ChangeNotifier {
+class ForgotPasswordController extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   String errorMessage = '';
 

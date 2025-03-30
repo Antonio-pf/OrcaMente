@@ -1,30 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:orcamente/components/widgets/custom_text_field.dart';
 import 'package:orcamente/controllers/forget_password_controller.dart';
 import 'package:provider/provider.dart';
 
-class ForgetPasswordPage extends StatelessWidget {
+class ForgotPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ForgetPasswordController(),
+      create: (_) => ForgotPasswordController(),
       child: Scaffold(
-        appBar: AppBar(title: Text('Recuperar Senha')),
-        body: Consumer<ForgetPasswordController>(
+        appBar: AppBar(),
+        body: Consumer<ForgotPasswordController>(
           builder: (context, controller, child) {
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Usando o CustomTextField
+                  SvgPicture.asset(
+                    'assets/svg/forgot_password.svg',
+                    height: 150, 
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Esqueci a senha',
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Não se preocupe isso acontece. Por favor insira o email da sua conta',
+                    style: TextStyle(color: Colors.grey),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+
                   CustomTextField(
                     controller: controller.emailController,
                     hintText: 'E-mail',
                     icon: Icons.email,
                   ),
-                  const SizedBox(height: 16.0), // Espaçamento entre os campos
-
-                  // Exibindo mensagem de erro, se houver
+                  const SizedBox(height: 16.0),
                   if (controller.errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -34,14 +50,14 @@ class ForgetPasswordPage extends StatelessWidget {
                       ),
                     ),
 
-                  // Botão de recuperação de senha
                   Container(
                     margin: const EdgeInsets.only(top: 16.0),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          controller.recoverPassword(); // Chama a função de recuperação
+                          controller
+                              .recoverPassword();
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -49,7 +65,10 @@ class ForgetPasswordPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text('Recuperar senha', style: TextStyle(fontSize: 16)),
+                        child: const Text(
+                          'Recuperar senha',
+                          style: TextStyle(fontSize: 16),
+                        ),
                       ),
                     ),
                   ),

@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       builder: DevicePreview.appBuilder,
       routes: {
         '/register': (context) => CadastroPage(),
-        '/forget-password': (context) => ForgetPasswordPage(), 
+        '/forget-password': (context) => ForgotPasswordPage(), 
       },
     );
   }

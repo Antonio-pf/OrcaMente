@@ -66,6 +66,7 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                 
+                 const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -76,6 +77,7 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                 
+                 const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
