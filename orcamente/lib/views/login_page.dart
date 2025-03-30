@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // O LoginController é fornecido aqui
     return ChangeNotifierProvider(
       create: (context) => LoginController(
         emailController: TextEditingController(),
@@ -54,7 +53,6 @@ class LoginPage extends StatelessWidget {
                       icon: Icons.lock,
                       isPassword: true,
                       onChanged: (text) {
-                        // limpar mensagem de erro apos user digitar
                         loginController.clearErrorMessage();
                       },
                     ),

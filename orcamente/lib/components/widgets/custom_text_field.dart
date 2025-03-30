@@ -5,7 +5,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final bool isPassword;
-  final Function(String)? onChanged; // Adicionando o parâmetro onChanged
+  final Function(String)? onChanged; 
 
   const CustomTextField({
     Key? key,
@@ -21,10 +21,11 @@ class CustomTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       obscureText: isPassword,
-      onChanged: onChanged, // Passando o onChanged para o TextField
+      onChanged: onChanged,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.grey),
         hintText: hintText,
+        hintStyle: TextStyle(color: Colors.grey.shade500),
         filled: true,
         fillColor: Colors.white,
         border: OutlineInputBorder(
