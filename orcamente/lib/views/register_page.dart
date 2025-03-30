@@ -12,7 +12,10 @@ class CadastroPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => RegisterController(),
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          automaticallyImplyLeading: true,
+        ),
         body: Consumer<RegisterController>(
           builder: (context, controller, child) {
             return SingleChildScrollView( 

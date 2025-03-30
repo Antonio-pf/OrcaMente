@@ -10,7 +10,10 @@ class ForgotPasswordPage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ForgotPasswordController(),
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          automaticallyImplyLeading: true,
+        ),
         body: Consumer<ForgotPasswordController>(
           builder: (context, controller, child) {
             return Padding(

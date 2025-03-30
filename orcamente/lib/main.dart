@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/views/forget_password.dart';
 import 'package:orcamente/views/login_page.dart';
 import 'package:orcamente/views/register_page.dart'; 
@@ -19,10 +20,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'OrçaMente',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: CustomTheme.lightTheme,  
+      darkTheme: CustomTheme.darkTheme,  
+      themeMode: ThemeMode.system,
       home: LoginPage(),
       builder: DevicePreview.appBuilder,
       routes: {
