@@ -48,6 +48,27 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             Image.asset('assets/images/logo_orcamente.png', height: 100),
 
+            const SizedBox(height: 16),
+
+            const Text(
+              "Entrar",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            const Text(
+              "Entre com seu usuário e senha para continuar",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey
+              ),
+            ),
+
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: 'E-mail'),
@@ -106,6 +127,15 @@ class _LoginPageState extends State<LoginPage> {
                     ); 
                   },
                   child: const Text('Esqueceu a senha?'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/about',
+                    ); 
+                  },
+                  child: const Text('Sobre'),
                 ),
               ],
             ),
