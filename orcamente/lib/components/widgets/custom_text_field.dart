@@ -27,26 +27,26 @@ class CustomTextField extends StatelessWidget {
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.grey.shade500),
         filled: true,
-        fillColor: Colors.white,  // Garantir que o fundo seja branco
+        fillColor: Colors.white, 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,  // Cor da borda
-            width: 1.5,  // Ajuste a largura da borda
+            color: Colors.grey.shade300,  
+            width: 1.5,  
           ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Colors.grey.shade300,  // Cor da borda quando o campo estiver habilitado
-            width: 1.5,  // Largura da borda
+            color: Colors.grey.shade300,  
+            width: 1.5, 
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: Theme.of(context).primaryColor,  // Cor da borda quando focado
-            width: 2.0,  // Largura da borda quando focado
+            color: Theme.of(context).primaryColor, 
+            width: 2.0, 
           ),
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),

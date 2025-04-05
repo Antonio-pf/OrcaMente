@@ -3,6 +3,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/views/about_page.dart';
 import 'package:orcamente/views/forget_password.dart';
+import 'package:orcamente/views/home_page.dart';
 import 'package:orcamente/views/login_page.dart';
 import 'package:orcamente/views/register_page.dart'; 
 
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/register': (context) => CadastroPage(),
         '/forget-password': (context) => ForgotPasswordPage(), 
         '/about': (context) => AboutPage(),
+        '/home': (context) => HomePage(),
       },
     );
   }
