@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../styles/custom_theme.dart';
 
 class QuizResultPage extends StatelessWidget {
@@ -137,7 +138,12 @@ class QuizResultPage extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setBool('quizAnswered', true);
+                    Navigator.pushReplacementNamed(context, '/home');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CustomTheme.primaryColor,
                     foregroundColor: Colors.white,
@@ -170,7 +176,7 @@ class QuizResultPage extends StatelessWidget {
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
         title: Text(title),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {}, 
+        onTap: () {},
       ),
     );
   }

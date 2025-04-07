@@ -90,10 +90,9 @@ class LoginPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (loginController.validateLogin()) {
-                          Navigator.pushNamed(context, '/home');
-                        }
-                      },
+                    loginController.handleLogin(context);
+                  },
+
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(

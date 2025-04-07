@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orcamente/views/control_page.dart';
 import 'package:orcamente/views/quiz_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
@@ -11,11 +12,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // alterar para pegar o nome do user apos o login
   final String userName = "Antônio";
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    Center(child: Text('Tela de Controle')),
+    //const ControlPage(),
+    Center(child: Text('Tela de Educação')),
     Center(child: Text('Tela de Educação')),
     Center(child: Text('Tela de Extrato')),
     Center(child: Text('Sobre')),
@@ -131,8 +134,8 @@ class _HomePageState extends State<HomePage> {
               label: 'Extrato',
             ),
             NavigationDestination(
-              icon: Icon(Icons.info_outline),
-              label: 'Sobre',
+              icon: Icon(Icons.person_outline),
+              label: 'Perfil',
             ),
           ],
         ),

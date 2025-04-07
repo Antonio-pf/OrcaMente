@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:orcamente/views/home_page.dart';
+import 'package:orcamente/views/quiz_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends ChangeNotifier {
   final TextEditingController emailController;
@@ -32,8 +35,27 @@ class LoginController extends ChangeNotifier {
       return true;
     } else {
       errorMessage = 'Email ou senha incorretos.';
-      notifyListeners(); 
+      notifyListeners();
       return false;
+    }
+  }
+
+  Future<void> handleLogin(BuildContext context) async {
+    if (!validateLogin()) return;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool quizAnswered = prefs.getBool('quizAnswered') ?? true;
+
+    if (!quizAnswered) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const QuizPage()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
     }
   }
 
@@ -43,6 +65,6 @@ class LoginController extends ChangeNotifier {
 
   void clearErrorMessage() {
     errorMessage = '';
-    notifyListeners(); 
+    notifyListeners();
   }
 }
