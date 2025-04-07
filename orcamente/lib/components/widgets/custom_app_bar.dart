@@ -5,6 +5,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int selectedIndex;
   final String userName;
   final VoidCallback onAvatarTap;
+  final VoidCallback onSettingsTap;
   final bool showSettings;
 
   const CustomAppBar({
@@ -13,6 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.userName,
     required this.onAvatarTap,
     required this.showSettings,
+    required this.onSettingsTap,
   });
 
   @override
@@ -49,7 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: [
           AnimatedOpacity(
             opacity: showSettings ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 400), 
+            duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOutCubic,
             child: Visibility(
               visible: showSettings,
@@ -57,17 +59,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               maintainAnimation: true,
               maintainSize: true,
               child: IconButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Configurações futuras...')),
-                  );
-                },
-                icon: const Icon(Icons.settings, color: CustomTheme.neutralWhite),
+                onPressed: onSettingsTap, 
+                icon: const Icon(
+                  Icons.settings,
+                  color: CustomTheme.neutralWhite,
+                ),
               ),
             ),
           ),
 
-            const SizedBox(width: 12),
+          const SizedBox(width: 12),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: GestureDetector(

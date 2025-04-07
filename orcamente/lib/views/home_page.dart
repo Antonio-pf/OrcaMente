@@ -3,6 +3,7 @@ import 'package:orcamente/components/widgets/custom_app_bar.dart';
 import 'package:orcamente/views/quiz_page.dart';
 import 'package:orcamente/views/course_page.dart';
 import 'package:orcamente/views/user_profile_view.dart';
+import 'package:orcamente/views/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 
@@ -17,11 +18,12 @@ class _HomePageState extends State<HomePage> {
   final String userName = "Antônio";
   int _selectedIndex = 0;
   bool _showUserPanel = false;
+  bool _showSettingsPage = false;
 
-  final List<Widget> _pages = const [
-    Center(child: Text('Tela de Controle Financeiro (em construção)')),
-    CourseListPage(),
-    Center(child: Text('Tela de Extrato (em construção)')),
+  final List<Widget> _pages = [
+    Center(child: Text('Tela de Controle')),
+    const CourseListPage(),
+    Center(child: Text('Tela de Extrato')),
   ];
 
   @override
@@ -48,6 +50,21 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _selectedIndex = index;
       _showUserPanel = false;
+      _showSettingsPage = false;
+    });
+  }
+
+  void _onAvatarTap() {
+    setState(() {
+      _showUserPanel = !_showUserPanel;
+      _showSettingsPage = false;
+    });
+  }
+
+  void _onSettingsTap() {
+    setState(() {
+      _showSettingsPage = true;
+      _showUserPanel = false;
     });
   }
 
@@ -60,17 +77,16 @@ class _HomePageState extends State<HomePage> {
         selectedIndex: _selectedIndex,
         userName: userName,
         showSettings: _showUserPanel,
-        onAvatarTap: () {
-          setState(() {
-            _showUserPanel = !_showUserPanel;
-          });
-        },
+        onAvatarTap: _onAvatarTap,
+        onSettingsTap: _onSettingsTap,
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        child: _showUserPanel
-            ? const UserProfileView()
-            : _pages[_selectedIndex],
+        child: _showSettingsPage
+            ? const SettingsPage()
+            : _showUserPanel
+                ? const UserProfileView()
+                : _pages[_selectedIndex],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
