@@ -6,6 +6,8 @@ import 'package:orcamente/views/user_profile_view.dart';
 import 'package:orcamente/views/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
+import 'package:provider/provider.dart';
+import 'package:orcamente/controllers/home_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final String userName = "Antônio";
   int _selectedIndex = 0;
   bool _showUserPanel = false;
   bool _showSettingsPage = false;
@@ -30,6 +31,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _checkFirstLogin();
+
+    // update no title do app bar uma vez
+    Future.microtask(() {
+      context.read<HomeController>().initTitleChange();
+    });
   }
 
   Future<void> _checkFirstLogin() async {
@@ -52,6 +58,10 @@ class _HomePageState extends State<HomePage> {
       _showUserPanel = false;
       _showSettingsPage = false;
     });
+
+    if (index == 0) {
+      context.read<HomeController>().initTitleChange();
+    }
   }
 
   void _onAvatarTap() {
@@ -71,11 +81,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final controller = context.watch<HomeController>();
+    final String title = _selectedIndex == 1 ? 'Para você' : controller.appBarTitle;
 
     return Scaffold(
       appBar: CustomAppBar(
         selectedIndex: _selectedIndex,
-        userName: userName,
+        title: title,
         showSettings: _showUserPanel,
         onAvatarTap: _onAvatarTap,
         onSettingsTap: _onSettingsTap,

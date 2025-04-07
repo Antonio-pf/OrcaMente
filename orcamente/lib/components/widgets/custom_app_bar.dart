@@ -2,25 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final int selectedIndex;
-  final String userName;
+  final String title;
   final VoidCallback onAvatarTap;
   final VoidCallback onSettingsTap;
   final bool showSettings;
+  final int selectedIndex;
 
   const CustomAppBar({
     super.key,
-    required this.selectedIndex,
-    required this.userName,
+    required this.title,
     required this.onAvatarTap,
     required this.showSettings,
     required this.onSettingsTap,
+    required this.selectedIndex,
   });
 
   @override
   Widget build(BuildContext context) {
-    final String title = selectedIndex == 1 ? 'Para você' : 'Olá, $userName';
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -59,7 +57,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               maintainAnimation: true,
               maintainSize: true,
               child: IconButton(
-                onPressed: onSettingsTap, 
+                onPressed: onSettingsTap,
                 icon: const Icon(
                   Icons.settings,
                   color: CustomTheme.neutralWhite,
@@ -67,7 +65,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
-
           const SizedBox(width: 12),
           Padding(
             padding: const EdgeInsets.only(right: 12),
