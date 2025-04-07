@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: 'OrçaMente',
       theme: CustomTheme.lightTheme,  
       darkTheme: CustomTheme.darkTheme,  
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       home: LoginPage(),
       builder: DevicePreview.appBuilder,
       routes: {
