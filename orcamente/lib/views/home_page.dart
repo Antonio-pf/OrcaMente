@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:orcamente/views/control_page.dart';
-import 'package:orcamente/views/course_modules_pages.dart';
-import 'package:orcamente/views/course_page.dart';
+import 'package:orcamente/components/widgets/custom_app_bar.dart';
 import 'package:orcamente/views/quiz_page.dart';
+import 'package:orcamente/views/course_page.dart';
+import 'package:orcamente/views/user_profile_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 
@@ -16,14 +16,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final String userName = "Antônio";
   int _selectedIndex = 0;
+  bool _showUserPanel = false;
 
-  final List<Widget> _pages = [
-    //const ControlPage(),
-    Center(child: Text('Tela de Educação')),
-   const CourseListPage(),
-    Center(child: Text('Tela de Educação')),
-    Center(child: Text('Tela de Extrato')),
-    Center(child: Text('Sobre')),
+  final List<Widget> _pages = const [
+    Center(child: Text('Tela de Controle Financeiro (em construção)')),
+    CourseListPage(),
+    Center(child: Text('Tela de Extrato (em construção)')),
   ];
 
   @override
@@ -49,6 +47,7 @@ class _HomePageState extends State<HomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _showUserPanel = false;
     });
   }
 
@@ -57,50 +56,22 @@ class _HomePageState extends State<HomePage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                CustomTheme.primaryColor,
-                CustomTheme.primaryDark,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            title: Text(
-              'Olá, $userName',
-              style: const TextStyle(
-                color: CustomTheme.neutralWhite,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.settings),
-                color: CustomTheme.neutralWhite,
-                onPressed: () {
-                },
-              ),
-            ],
-          ),
-        ),
+      appBar: CustomAppBar(
+        selectedIndex: _selectedIndex,
+        userName: userName,
+        showSettings: _showUserPanel,
+        onAvatarTap: () {
+          setState(() {
+            _showUserPanel = !_showUserPanel;
+          });
+        },
       ),
-      body: _pages[_selectedIndex],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _showUserPanel
+            ? const UserProfileView()
+            : _pages[_selectedIndex],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: isDark
@@ -135,10 +106,6 @@ class _HomePageState extends State<HomePage> {
             NavigationDestination(
               icon: Icon(Icons.history),
               label: 'Extrato',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              label: 'Perfil',
             ),
           ],
         ),
