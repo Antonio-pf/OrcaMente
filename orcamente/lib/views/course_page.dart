@@ -3,7 +3,7 @@ import 'package:orcamente/components/widgets/custom_course_card.dart';
 import 'package:orcamente/models/course.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/views/course_modules_pages.dart';
-
+import 'package:orcamente/views/game/game_page.dart';
 
 class CourseListPage extends StatelessWidget {
   const CourseListPage({super.key});
@@ -37,33 +37,45 @@ class CourseListPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 4,
-                ),
-                itemCount: courses.length,
-                itemBuilder: (context, index) {
-                  final course = courses[index];
-                  final icon = getCourseIcon(course.title);
 
-                  return CustomCourseCard(
-                    title: course.title,
-                    icon: icon,
+            // Conteúdo scrollável
+            Expanded(
+              child: ListView(
+                children: [
+                  // Cursos
+                  ...courses.map((course) {
+                    final icon = getCourseIcon(course.title);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: CustomCourseCard(
+                        title: course.title,
+                        icon: icon,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  CourseModulesPage(course: course),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }).toList(),
+
+                  CustomCourseCard(
+                    title: 'Aprenda Jogando',
+                    icon: Icons.videogame_asset,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              CourseModulesPage(course: course),
-                        ),
+                          builder: (_) => EndlessRunnerGame(),
+                        )
                       );
                     },
-                  );
-                },
+                  ),
+                ],
               ),
             ),
           ],
