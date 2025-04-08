@@ -9,10 +9,12 @@ Map<String, dynamic> generatePromotion(double screenWidth) {
     "Free Shipping",
   ];
 
+  const positioFloor = 0.1; 
+  const positionAbove = 0.3;
   bool isHigh = random.nextDouble() < 0.7; // 70% de chance de aparecer no alto
   double y = isHigh
-      ? (0.3 + random.nextDouble() * 0.1) // entre 0.3 e 0.4
-      : 0.1; // chão
+      ? (positionAbove + random.nextDouble() * 0.1) 
+      : positioFloor;
 
   return {
     "x": screenWidth + 600,

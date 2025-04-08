@@ -8,10 +8,10 @@ class GameController {
   final ValueNotifier<double> playerY = ValueNotifier(0.82);
   final ValueNotifier<double> backgroundX1 = ValueNotifier(0);
   final ValueNotifier<double> backgroundX2 = ValueNotifier(0);
-  
+
   final ValueNotifier<double> dinheiro = ValueNotifier(1500.0);
-final ValueNotifier<int> felicidade = ValueNotifier(100); // valor inicial
-final ValueNotifier<int> conhecimento = ValueNotifier(0); // valor inicial
+  final ValueNotifier<int> felicidade = ValueNotifier(100); 
+  final ValueNotifier<int> conhecimento = ValueNotifier(0); 
 
   final ValueNotifier<String> feedbackText = ValueNotifier("");
   final ValueNotifier<List<Map<String, dynamic>>> obstacles = ValueNotifier([]);
