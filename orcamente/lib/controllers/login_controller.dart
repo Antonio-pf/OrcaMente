@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:orcamente/views/auth/home_page.dart';
+import 'package:orcamente/views/home_page.dart';
 import 'package:orcamente/views/quiz/quiz_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
