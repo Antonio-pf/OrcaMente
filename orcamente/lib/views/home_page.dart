@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:orcamente/controllers/home_controller.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   bool _showUserPanel = false;
   bool _showSettingsPage = false;
+  bool _isLoading = true;
 
   final List<Widget> _pages = [
     const PiggyBankPage(),
@@ -51,6 +53,11 @@ class _HomePageState extends State<HomePage> {
         );
       });
     }
+
+    await Future.delayed(const Duration(seconds: 2)); 
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _onItemTapped(int index) {
@@ -93,14 +100,16 @@ class _HomePageState extends State<HomePage> {
         onAvatarTap: _onAvatarTap,
         onSettingsTap: _onSettingsTap,
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _showSettingsPage
-            ? const SettingsPage()
-            : _showUserPanel
-                ? const UserProfileView()
-                : _pages[_selectedIndex],
-      ),
+      body: _isLoading
+          ? _buildShimmerBody()
+          : AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _showSettingsPage
+                  ? const SettingsPage()
+                  : _showUserPanel
+                      ? const UserProfileView()
+                      : _pages[_selectedIndex],
+            ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: isDark
@@ -137,6 +146,28 @@ class _HomePageState extends State<HomePage> {
               label: 'Extrato',
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerBody() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Column(
+          children: List.generate(3, (index) {
+            return Container(
+              height: 100,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            );
+          }),
         ),
       ),
     );
