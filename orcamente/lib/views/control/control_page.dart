@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orcamente/components/widgets/motivation_card.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -206,26 +207,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: CustomTheme.warningColor.withOpacity(0.1),
-                border: Border.all(color: CustomTheme.warningColor),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.tips_and_updates, color: CustomTheme.warningColor),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "Economize pequenos valores diariamente para criar um hábito.",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+             const MotivationCard(),
           ],
         ),
       ),
