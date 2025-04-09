@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/components/widgets/custom_app_bar.dart';
-import 'package:orcamente/views/quiz_page.dart';
-import 'package:orcamente/views/course_page.dart';
-import 'package:orcamente/views/user_profile_view.dart';
-import 'package:orcamente/views/settings_page.dart';
+import 'package:orcamente/views/quiz/quiz_page.dart';
+import 'package:orcamente/views/course/course_page.dart';
+import 'package:orcamente/views/user_settings/user_profile_view.dart';
+import 'package:orcamente/views/user_settings/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:provider/provider.dart';

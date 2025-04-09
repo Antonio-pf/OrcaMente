@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:orcamente/components/widgets/custom_course_card.dart';
 import 'package:orcamente/models/course.dart';
 import 'package:orcamente/styles/custom_theme.dart';
-import 'package:orcamente/views/course_modules_pages.dart';
+import 'package:orcamente/views/course/course_modules_pages.dart';
 import 'package:orcamente/views/game/game_page.dart';
 
 class CourseListPage extends StatelessWidget {

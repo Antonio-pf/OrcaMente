@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/controllers/quiz_controller.dart';
-import 'package:orcamente/views/quiz_result.dart';
-import '../../styles/custom_theme.dart';
+import 'package:orcamente/views/quiz/quiz_result.dart';
+import '../../../styles/custom_theme.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({super.key});

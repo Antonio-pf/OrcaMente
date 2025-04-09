@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/styles/custom_theme.dart';
-import 'package:orcamente/views/login_page.dart';
+import 'package:orcamente/views/auth/login_page.dart';
 
 class UserProfileView extends StatelessWidget {
   const UserProfileView({super.key});

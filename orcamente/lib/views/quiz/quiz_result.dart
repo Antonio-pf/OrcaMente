@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../styles/custom_theme.dart';
+import '../../../styles/custom_theme.dart';
 
 class QuizResultPage extends StatelessWidget {
   final String profile;

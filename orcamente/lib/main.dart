@@ -7,10 +7,10 @@ import 'package:orcamente/controllers/theme_controller.dart';
 import 'package:orcamente/controllers/home_controller.dart';
 
 import 'package:orcamente/views/about_page.dart';
-import 'package:orcamente/views/forget_password.dart';
-import 'package:orcamente/views/home_page.dart';
-import 'package:orcamente/views/login_page.dart';
-import 'package:orcamente/views/register_page.dart';
+import 'package:orcamente/views/auth/forget_password.dart';
+import 'package:orcamente/views/auth/home_page.dart';
+import 'package:orcamente/views/auth/login_page.dart';
+import 'package:orcamente/views/auth/register_page.dart';
 
 void main() {
   runApp(
