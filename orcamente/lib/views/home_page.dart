@@ -3,6 +3,7 @@ import 'package:orcamente/components/widgets/custom_app_bar.dart';
 import 'package:orcamente/views/control/control_page.dart';
 import 'package:orcamente/views/quiz/quiz_page.dart';
 import 'package:orcamente/views/course/course_page.dart';
+import 'package:orcamente/views/shimmer_list.dart';
 import 'package:orcamente/views/user_settings/user_profile_view.dart';
 import 'package:orcamente/views/user_settings/settings_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,7 +102,7 @@ class _HomePageState extends State<HomePage> {
         onSettingsTap: _onSettingsTap,
       ),
       body: _isLoading
-          ? _buildShimmerBody()
+          ? const ShimmerPlaceholderList(itemCount:  4)
           : AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: _showSettingsPage
@@ -146,28 +147,6 @@ class _HomePageState extends State<HomePage> {
               label: 'Extrato',
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildShimmerBody() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
-        child: Column(
-          children: List.generate(3, (index) {
-            return Container(
-              height: 100,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(12),
-              ),
-            );
-          }),
         ),
       ),
     );
