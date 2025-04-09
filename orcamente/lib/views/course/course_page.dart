@@ -4,9 +4,30 @@ import 'package:orcamente/models/course.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/views/course/course_modules_pages.dart';
 import 'package:orcamente/views/game/game_page.dart';
+import 'package:orcamente/views/shimmer_list.dart';
 
-class CourseListPage extends StatelessWidget {
+class CourseListPage extends StatefulWidget {
   const CourseListPage({super.key});
+
+  @override
+  State<CourseListPage> createState() => _CourseListPageState();
+}
+
+class _CourseListPageState extends State<CourseListPage> {
+  bool _isLoading = true;
+  late List<Course> courses;
+
+  @override
+  void initState() {
+    super.initState();
+    // Simula carregamento
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        courses = Course.sampleCourses;
+        _isLoading = false;
+      });
+    });
+  }
 
   IconData getCourseIcon(String title) {
     if (title == 'Finanças na Prática') {
@@ -18,8 +39,6 @@ class CourseListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final courses = Course.sampleCourses;
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -38,45 +57,44 @@ class CourseListPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Conteúdo scrollável
             Expanded(
-              child: ListView(
-                children: [
-                  // Cursos
-                  ...courses.map((course) {
-                    final icon = getCourseIcon(course.title);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: CustomCourseCard(
-                        title: course.title,
-                        icon: icon,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CourseModulesPage(course: course),
+              child: _isLoading
+                  ? const ShimmerPlaceholderList(itemCount: 3, itemHeight: 100)
+                  : ListView(
+                      children: [
+                        ...courses.map((course) {
+                          final icon = getCourseIcon(course.title);
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: CustomCourseCard(
+                              title: course.title,
+                              icon: icon,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CourseModulesPage(course: course),
+                                  ),
+                                );
+                              },
                             ),
                           );
-                        },
-                      ),
-                    );
-                  }).toList(),
+                        }).toList(),
 
-                  CustomCourseCard(
-                    title: 'Aprenda Jogando',
-                    icon: Icons.videogame_asset,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EndlessRunnerGame(),
-                        )
-                      );
-                    },
-                  ),
-                ],
-              ),
+                        CustomCourseCard(
+                          title: 'Aprenda Jogando',
+                          icon: Icons.videogame_asset,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EndlessRunnerGame(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
             ),
           ],
         ),
