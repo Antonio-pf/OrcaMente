@@ -17,6 +17,8 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> {
   DateTime? lastTap;
   final int doubleTapThresholdMs = 300;
 
+  bool _gameOverShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +30,51 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> {
       _controller.start(screenWidth, screenHeight);
     });
   }
+
+void checkGameOver(double dinheiro) {
+  if (dinheiro < 0 && !_gameOverShown) {
+    _gameOverShown = true;
+    _controller.stop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Fim de Jogo"),
+            content: const Text(
+              "Você ficou sem dinheiro!\n\n💡 Dica: Sempre tenha uma reserva para imprevistos e evite dívidas desnecessárias.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); 
+                  _controller.restart(screenWidth, screenHeight); 
+                  _gameOverShown = false;
+                },
+                child: const Text("Reiniciar"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); 
+                  _gameOverShown = false;
+                },
+                child: const Text("Fechar"),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+}
+
+
 
   void onTapDownHandler() {
     final now = DateTime.now();
@@ -150,6 +197,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> {
             ValueListenableBuilder<double>(
               valueListenable: _controller.dinheiro,
               builder: (_, dinheiro, __) {
+                checkGameOver(dinheiro); // 👈 aqui que detecta o game over
                 return ValueListenableBuilder<int>(
                   valueListenable: _controller.felicidade,
                   builder: (_, felicidade, __) {

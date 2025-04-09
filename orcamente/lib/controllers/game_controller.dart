@@ -10,14 +10,17 @@ class GameController {
   final ValueNotifier<double> backgroundX2 = ValueNotifier(0);
 
   final ValueNotifier<double> dinheiro = ValueNotifier(1500.0);
-  final ValueNotifier<int> felicidade = ValueNotifier(100); 
-  final ValueNotifier<int> conhecimento = ValueNotifier(0); 
+  final ValueNotifier<int> felicidade = ValueNotifier(100);
+  final ValueNotifier<int> conhecimento = ValueNotifier(0);
 
   final ValueNotifier<String> feedbackText = ValueNotifier("");
   final ValueNotifier<List<Map<String, dynamic>>> obstacles = ValueNotifier([]);
   final ValueNotifier<List<Map<String, dynamic>>> promotions = ValueNotifier(
     [],
   );
+
+  double? _screenWidth;
+  double? _screenHeight;
 
   double velocity = 0;
   final double gravity = 0.0055;
@@ -168,6 +171,41 @@ class GameController {
       velocity = jumpForce;
       jumpCount++;
     }
+  }
+
+  void stop() {
+    gameLoop.cancel();
+  }
+
+  void restart(double screenWidth, double screenHeight) {
+    // Cancela o loop atual se estiver ativo
+    gameLoop.cancel();
+
+    // Reseta todas as variáveis
+    playerY.value = 0.82;
+    backgroundX1.value = 0;
+    backgroundX2.value = screenWidth;
+    dinheiro.value = 1500.0;
+    felicidade.value = 100;
+    conhecimento.value = 0;
+    feedbackText.value = "";
+
+    velocity = 0;
+    isJumping = false;
+    jumpCount = 0;
+
+    obstacles.value = [
+      {"x": screenWidth + 100.0, "label": "Conta de Luz", "collided": false},
+      {"x": screenWidth + 400.0, "label": "Empréstimo", "collided": false},
+    ];
+
+    promotions.value = [
+      generatePromotion(screenWidth),
+      generatePromotion(screenWidth + 450),
+    ];
+
+    // Inicia novamente o jogo
+    start(screenWidth, screenHeight);
   }
 
   void dispose() {
