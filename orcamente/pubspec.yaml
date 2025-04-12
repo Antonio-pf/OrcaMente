@@ -34,7 +34,7 @@ dependencies:
   lucide_icons: ^0.257.0
   shimmer: ^3.0.0 
   flutter_speed_dial: ^7.0.0
-
+  flutter_multi_formatter: ^2.7.4
 
 
   # The following adds the Cupertino Icons font to your application.
