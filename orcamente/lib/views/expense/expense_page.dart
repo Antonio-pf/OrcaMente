@@ -117,10 +117,7 @@ class _ExpensePageViewState extends State<ExpensePage>
                             });
                           } else {
                             _controller.addExpense(desc, value, category);
-                            Navigator.pop(
-                              modalContext,
-                              true,
-                            );
+                            Navigator.pop(modalContext, true);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -158,13 +155,13 @@ class _ExpensePageViewState extends State<ExpensePage>
   Color _getCardColor(String category) {
     switch (category) {
       case 'essencial':
-        return CustomTheme.infoColor;
+        return const Color.fromARGB(255, 145, 233, 198);
       case 'lazer':
-        return CustomTheme.primaryLight;
+        return const Color.fromARGB(255, 145, 233, 198);
       case 'outros':
-        return CustomTheme.errorColor.withOpacity(0.01);
+        return const Color.fromARGB(255, 145, 233, 198);
       default:
-        return Colors.white;
+        return Colors.grey;
     }
   }
 
@@ -240,14 +237,13 @@ class _ExpensePageViewState extends State<ExpensePage>
         centerTitle: true,
         automaticallyImplyLeading: false,
         title: const Text(
-          'Extrato do Mês' ,
+          'Extrato do Mês',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.green
+            color: Colors.green,
           ),
-          
-          ),
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: _categories.map((c) => Tab(text: _categoryLabels[c])).toList(),
