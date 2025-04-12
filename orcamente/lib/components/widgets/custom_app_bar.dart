@@ -74,8 +74,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 radius: 18,
                 backgroundColor: Colors.white,
                 child: ClipOval(
-                  child: Image.network(
-                    'https://i.pravatar.cc/36?img=50',
+                  child: Image.asset(
+                    'assets/images/profile.jpg',
                     fit: BoxFit.cover,
                     width: 36,
                     height: 36,
