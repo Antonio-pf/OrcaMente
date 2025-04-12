@@ -47,11 +47,12 @@ class _CourseListPageState extends State<CourseListPage> {
             const SizedBox(height: 24),
             const Center(
               child: Text(
-                'Escolha o que deseja desbravar',
+                'Escolha o que deseja aprofundar',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.green
                 ),
               ),
             ),

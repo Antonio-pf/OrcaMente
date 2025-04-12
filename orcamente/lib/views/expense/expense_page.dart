@@ -120,7 +120,7 @@ class _ExpensePageViewState extends State<ExpensePage>
                             Navigator.pop(
                               modalContext,
                               true,
-                            ); // <- retorna true para sinalizar sucesso
+                            );
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -238,6 +238,7 @@ class _ExpensePageViewState extends State<ExpensePage>
       appBar: AppBar(
         elevation: 2,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: const Text(
           'Extrato do Mês' ,
           style: TextStyle(
