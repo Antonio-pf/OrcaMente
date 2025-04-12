@@ -4,7 +4,7 @@ import 'package:orcamente/components/widgets/expense/category_speed_dial.dart';
 import 'package:orcamente/components/widgets/expense/summary_card.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
 import 'package:orcamente/styles/custom_theme.dart';
-import 'package:orcamente/views/shimmer_list.dart';
+import 'package:orcamente/components/widgets/shimmer_list.dart';
 import 'package:intl/intl.dart';
 
 class ExpensePage extends StatefulWidget {

@@ -338,7 +338,7 @@ int newLevel = (score.value / _pointsPerLevel).floor() + 1;    if (newLevel > _d
       generatePromotion(screenWidth),
       generatePromotion(screenWidth + 450),
     ];
-
+        
     // Inicia novamente o jogo
     start(screenWidth, screenHeight);
   }

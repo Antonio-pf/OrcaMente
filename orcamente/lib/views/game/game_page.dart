@@ -26,13 +26,11 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
     super.initState();
     _controller = GameController();
     
-    // Configurar animação do personagem
     _playerAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..repeat(reverse: true);
     
-    // Iniciar o jogo após o primeiro frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final screenWidth = MediaQuery.of(context).size.width;
       final screenHeight = MediaQuery.of(context).size.height;

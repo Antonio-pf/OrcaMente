@@ -4,7 +4,7 @@ import 'package:orcamente/models/course.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/views/course/course_modules_pages.dart';
 import 'package:orcamente/views/game/game_page.dart';
-import 'package:orcamente/views/shimmer_list.dart';
+import 'package:orcamente/components/widgets/shimmer_list.dart';
 
 class CourseListPage extends StatefulWidget {
   const CourseListPage({super.key});
