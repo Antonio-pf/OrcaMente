@@ -10,7 +10,7 @@ class GameController {
   final ValueNotifier<double> backgroundX1 = ValueNotifier(0);
   final ValueNotifier<double> backgroundX2 = ValueNotifier(0);
 
-  final ValueNotifier<double> dinheiro = ValueNotifier(1500.0);
+  final ValueNotifier<double> dinheiro = ValueNotifier(300.0);
   final ValueNotifier<int> felicidade = ValueNotifier(100);
   final ValueNotifier<int> conhecimento = ValueNotifier(0);
   final ValueNotifier<int> score = ValueNotifier(0);
@@ -298,14 +298,12 @@ int newLevel = (score.value / _pointsPerLevel).floor() + 1;    if (newLevel > _d
   }
 
   void restart(double screenWidth, double screenHeight) {
-    // Cancela o loop atual se estiver ativo
     gameLoop?.cancel();
 
-    // Reseta todas as variáveis
     playerY.value = 0.82;
     backgroundX1.value = 0;
     backgroundX2.value = screenWidth;
-    dinheiro.value = 1500.0;
+    dinheiro.value = 300.0;
     felicidade.value = 100;
     conhecimento.value = 0;
     score.value = 0;

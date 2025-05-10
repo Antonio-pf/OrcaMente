@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';  
+import 'firebase_options.dart'; 
 
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:orcamente/controllers/theme_controller.dart';
@@ -12,10 +14,17 @@ import 'package:orcamente/views/home_page.dart';
 import 'package:orcamente/views/auth/login_page.dart';
 import 'package:orcamente/views/auth/register_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, 
+  );
+  
+    print('✅ Firebase inicializado com sucesso');
+    
   runApp(
     DevicePreview(
-      enabled: true, // Deixe true para desenvolvimento
+      enabled: true, 
       builder: (context) => const AppProviders(),
     ),
   );

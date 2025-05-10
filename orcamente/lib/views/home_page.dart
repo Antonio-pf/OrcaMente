@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _checkFirstLogin();
 
-    // update no title do app bar uma vez
     Future.microtask(() {
       context.read<HomeController>().initTitleChange();
     });
