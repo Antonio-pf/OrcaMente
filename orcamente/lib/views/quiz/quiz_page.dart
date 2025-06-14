@@ -14,23 +14,47 @@ class _QuizPageState extends State<QuizPage> {
   final QuizController _controller = QuizController();
   final List<int> _selectedOptions = [];
 
+  bool _isSaving = false; // Para evitar múltiplas chamadas
+
   @override
   Widget build(BuildContext context) {
     if (_controller.isFinished) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => QuizResultPage(
-              profile: _controller.getBehaviorProfile(),
-              knowledge: _controller.getKnowledgeLevel(),
-            ),
-          ),
-        );
-      });
+      // Evita chamadas repetidas
+      if (!_isSaving) {
+        _isSaving = true;
 
-// retornei ao inves de container pois é mais leve
-      return const SizedBox.shrink(); 
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          bool saved = await _controller.saveAnswers();
+
+          if (!mounted) return;
+
+          if (saved) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => QuizResultPage(
+                  profile: _controller.getBehaviorProfile(),
+                  knowledge: _controller.getKnowledgeLevel(),
+                ),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Falha ao salvar respostas. Tente novamente.')),
+            );
+
+            // Aqui você pode decidir voltar para alguma etapa ou permitir tentar de novo
+            setState(() {
+              _isSaving = false;
+              _controller.currentStep = 0;
+              _controller.totalScore = 0;
+              _controller.selectedOptions.clear();
+            });
+          }
+        });
+      }
+
+      return const SizedBox.shrink();
     }
 
     return Scaffold(

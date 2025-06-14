@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orcamente/models/quiz.dart';
 
 class QuizController {
   int currentStep = 0;
   int totalScore = 0;
+  final List<int> selectedOptions = [];
 
   final List<QuizQuestion> questions = [
     QuizQuestion(
@@ -37,17 +40,23 @@ class QuizController {
     ),
   ];
 
+  /// Avança para a próxima pergunta, acumula pontuação e salva opção selecionada
   void nextStep(int selectedOptionIndex) {
-    totalScore += questions[currentStep].scores[selectedOptionIndex];
-    currentStep++;
+    if (!isFinished) {
+      totalScore += questions[currentStep].scores[selectedOptionIndex];
+      selectedOptions.add(selectedOptionIndex);
+      currentStep++;
+    }
   }
 
+  /// Retorna o perfil de comportamento financeiro com base na pontuação
   String getBehaviorProfile() {
     if (totalScore >= 10) return 'Gastador';
     if (totalScore >= 6) return 'Poupador';
     return 'Investidor';
   }
 
+  /// Retorna o nível de conhecimento financeiro com base na pontuação
   String getKnowledgeLevel() {
     if (totalScore >= 10) return 'Baixo conhecimento financeiro';
     if (totalScore >= 6) return 'Conhecimento intermediário';
@@ -56,4 +65,30 @@ class QuizController {
 
   bool get isLastStep => currentStep == questions.length - 1;
   bool get isFinished => currentStep >= questions.length;
+
+  Future<bool> saveAnswers() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return false;
+
+      final dataToSave = {
+        'userId': user.uid,
+        'answers': selectedOptions,
+        'totalScore': totalScore,
+        'behaviorProfile': getBehaviorProfile(),
+        'knowledgeLevel': getKnowledgeLevel(),
+        'answeredAt': FieldValue.serverTimestamp(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('quiz_respostas')
+          .doc(user.uid)
+          .set(dataToSave);
+
+      return true;
+    } catch (e) {
+      print('[ERRO] Falha ao salvar quiz: $e');
+      return false;
+    }
+  }
 }

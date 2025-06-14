@@ -4,6 +4,9 @@ import 'package:orcamente/styles/custom_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class PiggyBankPage extends StatefulWidget {
   const PiggyBankPage({super.key});
@@ -17,6 +20,9 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
   double _goalAmount = 500.0;
   final TextEditingController _amountController = TextEditingController();
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     super.initState();
@@ -24,18 +30,37 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
   }
 
   Future<void> _loadPiggyBankAmount() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      piggyBankAmount = prefs.getDouble('piggy_bank_amount') ?? 0.0;
-    });
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final docRef = _firestore.collection('piggyBanks').doc(user.uid);
+    final docSnapshot = await docRef.get();
+
+    if (docSnapshot.exists) {
+      final data = docSnapshot.data();
+      setState(() {
+        piggyBankAmount = (data?['amount'] ?? 0).toDouble();
+      });
+    } else {
+      setState(() {
+        piggyBankAmount = 0.0;
+      });
+    }
   }
 
   Future<void> _savePiggyBankAmount(double amount) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('piggy_bank_amount', amount);
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('Usuário não autenticado');
+
+    final docRef = _firestore.collection('piggyBanks').doc(user.uid);
+
+    await docRef.set({
+      'amount': amount,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
-  void _addAmountToPiggyBank() {
+  void _addAmountToPiggyBank() async {
     final amountText = _amountController.text;
     final amount = double.tryParse(
       toNumericString(amountText, allowPeriod: true),
@@ -46,48 +71,34 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
         piggyBankAmount += amount;
       });
 
-      _savePiggyBankAmount(piggyBankAmount);
-      _amountController.clear();
+      try {
+        await _savePiggyBankAmount(piggyBankAmount);
+        _amountController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text('Valor guardado com sucesso!'),
-              ),
-            ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Valor guardado com sucesso!'),
+            backgroundColor: Colors.green,
           ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.all(10),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao salvar no Firestore: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text('Informe um valor válido!'),
-              ),
-            ],
-          ),
+        const SnackBar(
+          content: Text('Informe um valor válido!'),
           backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          margin: const EdgeInsets.all(10),
-          duration: const Duration(seconds: 2),
         ),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +261,6 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     );
   }
   
-  // Extracted circular progress indicator for better organization
   Widget _buildCircularProgress(double progress) {
     return CircularPercentIndicator(
       radius: 50.0,
@@ -277,7 +287,6 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     );
   }
   
-  // Extracted amount info for better organization
   Widget _buildAmountInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,8 +516,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
       ),
     );
   }
-  
-  // Extracted stat card for better organization
+
   Widget _buildStatCard(
     BuildContext context,
     IconData icon,
