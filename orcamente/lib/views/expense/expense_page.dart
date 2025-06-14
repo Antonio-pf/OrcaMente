@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/components/widgets/custom_text_field.dart';
-import 'package:orcamente/components/widgets/expense/category_speed_dial.dart';
 import 'package:orcamente/components/widgets/expense/summary_card.dart';
+import 'package:orcamente/components/widgets/shimmer_list.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
 import 'package:orcamente/styles/custom_theme.dart';
-import 'package:orcamente/components/widgets/shimmer_list.dart';
-import 'package:intl/intl.dart';
 
 class ExpensePage extends StatefulWidget {
   const ExpensePage({super.key});
@@ -16,7 +14,7 @@ class ExpensePage extends StatefulWidget {
 
 class _ExpensePageViewState extends State<ExpensePage>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  late final TabController _tabController;
   final ExpenseController _controller = ExpenseController();
 
   final List<String> _categories = ['essencial', 'lazer', 'outros'];
@@ -25,7 +23,6 @@ class _ExpensePageViewState extends State<ExpensePage>
     'lazer': 'Lazer',
     'outros': 'Outros',
   };
-
   final Map<String, Color> _categoryColors = {
     'essencial': Colors.green,
     'lazer': Colors.purple,
@@ -38,50 +35,43 @@ class _ExpensePageViewState extends State<ExpensePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: _categories.length, vsync: this);
-
-    Future.delayed(const Duration(milliseconds: 1200), () {
-  if (mounted) {
-    setState(() {
-      _isLoading = false;
-    });
+    _loadExpenses();
   }
-});
 
+  Future<void> _loadExpenses() async {
+    try {
+      await _controller.fetchExpenses();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar despesas: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   double _getTotalExpense(String category) {
     final expenses = _controller.getExpensesByCategory(category);
-    return expenses.fold(0.0, (sum, expense) => sum + expense.value);
+    return expenses.fold(0.0, (sum, e) => sum + e.value);
   }
 
   double _getTotalAllExpenses() {
-    return _categories.fold(0.0, (sum, category) {
-      return sum + _getTotalExpense(category);
-    });
+    return _categories.fold(0.0, (sum, c) => sum + _getTotalExpense(c));
   }
 
   double _getCategoryPercentage(String category) {
-    final totalAll = _getTotalAllExpenses();
-    if (totalAll <= 0) return 0;
-
-    final categoryTotal = _getTotalExpense(category);
-    return (categoryTotal / totalAll) * 100;
-  }
-
-  Widget _buildSummaryCard() {
-    return SummaryCard(
-      totalAmount: _getTotalAllExpenses(),
-      categories: _categories,
-      categoryLabels: _categoryLabels,
-      categoryColors: _categoryColors,
-      getTotalExpense: _getTotalExpense,
-      getCategoryPercentage: _getCategoryPercentage,
-    );
+    final total = _getTotalAllExpenses();
+    if (total <= 0) return 0;
+    return (_getTotalExpense(category) / total) * 100;
   }
 
   void _openAddExpenseModal(String category) {
-    final TextEditingController descController = TextEditingController();
-    final TextEditingController valueController = TextEditingController();
+    final descController = TextEditingController();
+    final valueController = TextEditingController();
 
     String? errorText;
 
@@ -92,9 +82,9 @@ class _ExpensePageViewState extends State<ExpensePage>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (BuildContext modalContext) {
+      builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setModalState) {
             return SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(
@@ -119,9 +109,7 @@ class _ExpensePageViewState extends State<ExpensePage>
                       hintText: 'Descrição',
                       icon: Icons.edit,
                       onChanged: (_) {
-                        if (errorText != null) {
-                          setState(() => errorText = null);
-                        }
+                        if (errorText != null) setModalState(() => errorText = null);
                       },
                     ),
                     const SizedBox(height: 16),
@@ -130,9 +118,7 @@ class _ExpensePageViewState extends State<ExpensePage>
                       hintText: 'Valor',
                       icon: Icons.attach_money,
                       onChanged: (_) {
-                        if (errorText != null) {
-                          setState(() => errorText = null);
-                        }
+                        if (errorText != null) setModalState(() => errorText = null);
                       },
                     ),
                     if (errorText != null) ...[
@@ -146,27 +132,40 @@ class _ExpensePageViewState extends State<ExpensePage>
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          final desc = descController.text;
-                          final value =
-                              double.tryParse(valueController.text) ?? 0;
+                        onPressed: () async {
+                          final desc = descController.text.trim();
+                          final value = double.tryParse(valueController.text.replaceAll(',', '.')) ?? 0;
 
                           if (desc.isEmpty || value <= 0) {
-                            setState(() {
-                              errorText =
-                                  'Preencha todos os campos corretamente.';
+                            setModalState(() {
+                              errorText = 'Preencha todos os campos corretamente.';
                             });
-                          } else {
-                            _controller.addExpense(desc, value, category);
-                            Navigator.pop(modalContext, true);
+                            return;
+                          }
+
+                          try {
+                            await _controller.addExpense(desc, value, category);
+                            Navigator.pop(context);
+                            setState(() {}); // Atualiza lista
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Despesa adicionada com sucesso!'),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          } catch (e) {
+                            setModalState(() {
+                              errorText = 'Erro ao salvar despesa: $e';
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
+                          backgroundColor: CustomTheme.primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          backgroundColor: Theme.of(context).primaryColor,
                         ),
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text(
@@ -186,30 +185,7 @@ class _ExpensePageViewState extends State<ExpensePage>
           },
         );
       },
-    ).then((result) {
-      if (result == true) {
-        setState(() {});
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 8),
-                const Expanded(child: Text('Despesa adicionada com sucesso!')),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(10),
-            duration: const Duration(seconds: 1),
-          ),
-        );
-      }
-    });
+    );
   }
 
   Color _getCardColor(String category) {
@@ -253,10 +229,9 @@ class _ExpensePageViewState extends State<ExpensePage>
       itemCount: expenses.length,
       itemBuilder: (context, index) {
         final expense = expenses[index];
+
         return Dismissible(
-          key: Key(
-            '${expense.description}_${expense.value}_${expense.date.millisecondsSinceEpoch}',
-          ),
+          key: Key(expense.id),
           background: Container(
             decoration: BoxDecoration(
               color: Colors.red,
@@ -267,10 +242,9 @@ class _ExpensePageViewState extends State<ExpensePage>
             child: const Icon(Icons.delete, color: Colors.white),
           ),
           direction: DismissDirection.endToStart,
-          onDismissed: (direction) {
-            setState(() {
-              _controller.removeExpense(index, category);
-            });
+          onDismissed: (direction) async {
+            await _controller.removeExpense(expense.id);
+            setState(() {});
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -287,14 +261,13 @@ class _ExpensePageViewState extends State<ExpensePage>
                   borderRadius: BorderRadius.circular(10),
                 ),
                 margin: const EdgeInsets.all(10),
-                duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 3),
                 action: SnackBarAction(
                   label: 'DESFAZER',
                   textColor: Colors.white,
-                  onPressed: () {
-                    setState(() {
-                      _controller.undoRemoveExpense();
-                    });
+                  onPressed: () async {
+                    await _controller.undoRemoveExpense();
+                    setState(() {});
                   },
                 ),
               ),
@@ -308,16 +281,10 @@ class _ExpensePageViewState extends State<ExpensePage>
               borderRadius: BorderRadius.circular(12),
             ),
             child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 8,
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               title: Text(
                 expense.description,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               subtitle: Text(
                 '${expense.date.day}/${expense.date.month}/${expense.date.year}',
@@ -325,15 +292,23 @@ class _ExpensePageViewState extends State<ExpensePage>
               ),
               trailing: Text(
                 'R\$ ${expense.value.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSummaryCard() {
+    return SummaryCard(
+      totalAmount: _getTotalAllExpenses(),
+      categories: _categories,
+      categoryLabels: _categoryLabels,
+      categoryColors: _categoryColors,
+      getTotalExpense: _getTotalExpense,
+      getCategoryPercentage: _getCategoryPercentage,
     );
   }
 
@@ -345,10 +320,7 @@ class _ExpensePageViewState extends State<ExpensePage>
           _buildSummaryCard(),
           TabBar(
             controller: _tabController,
-            tabs:
-                _categories.map((c) {
-                  return Tab(text: _categoryLabels[c]);
-                }).toList(),
+            tabs: _categories.map((c) => Tab(text: _categoryLabels[c])).toList(),
             labelColor: Colors.green[700],
             unselectedLabelColor: Colors.grey[600],
             indicatorColor: Colors.green,
@@ -366,7 +338,7 @@ class _ExpensePageViewState extends State<ExpensePage>
           final currentIndex = _tabController.index;
           _openAddExpenseModal(_categories[currentIndex]);
         },
-        backgroundColor: Colors.green,
+        backgroundColor: CustomTheme.primaryColor,
         child: const Icon(Icons.add),
       ),
     );
