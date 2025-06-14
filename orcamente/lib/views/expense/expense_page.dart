@@ -3,6 +3,7 @@ import 'package:orcamente/components/widgets/custom_text_field.dart';
 import 'package:orcamente/components/widgets/expense/summary_card.dart';
 import 'package:orcamente/components/widgets/shimmer_list.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
+import 'package:orcamente/models/expense.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 
 class ExpensePage extends StatefulWidget {
@@ -30,6 +31,10 @@ class _ExpensePageViewState extends State<ExpensePage>
   };
 
   bool _isLoading = true;
+
+  // NOVO: estado para pesquisa e ordenação
+  String _searchQuery = '';
+  String _sortCriteria = 'data'; // 'data' ou 'descricao'
 
   @override
   void initState() {
@@ -67,6 +72,25 @@ class _ExpensePageViewState extends State<ExpensePage>
     final total = _getTotalAllExpenses();
     if (total <= 0) return 0;
     return (_getTotalExpense(category) / total) * 100;
+  }
+
+  // NOVO: método para filtrar e ordenar despesas conforme pesquisa e critério
+  List<Expense> _getFilteredExpenses(String category) {
+    final expenses = _controller.getExpensesByCategory(category);
+
+    final filtered = expenses.where((e) {
+      final desc = e.description.toLowerCase();
+      final query = _searchQuery.toLowerCase();
+      return desc.contains(query);
+    }).toList();
+
+    if (_sortCriteria == 'data') {
+      filtered.sort((a, b) => b.date.compareTo(a.date)); // mais recente primeiro
+    } else if (_sortCriteria == 'descricao') {
+      filtered.sort((a, b) => a.description.compareTo(b.description));
+    }
+
+    return filtered;
   }
 
   void _openAddExpenseModal(String category) {
@@ -201,14 +225,15 @@ class _ExpensePageViewState extends State<ExpensePage>
     }
   }
 
+  // ALTERADO para usar lista filtrada e ordenada
   Widget _buildExpenseList(String category) {
     if (_isLoading) {
       return const ShimmerPlaceholderList(itemCount: 2);
     }
 
-    final expenses = _controller.getExpensesByCategory(category);
+    final filteredExpenses = _getFilteredExpenses(category);
 
-    if (expenses.isEmpty) {
+    if (filteredExpenses.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -226,9 +251,9 @@ class _ExpensePageViewState extends State<ExpensePage>
 
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: expenses.length,
+      itemCount: filteredExpenses.length,
       itemBuilder: (context, index) {
-        final expense = expenses[index];
+        final expense = filteredExpenses[index];
 
         return Dismissible(
           key: Key(expense.id),
@@ -318,6 +343,70 @@ class _ExpensePageViewState extends State<ExpensePage>
       body: Column(
         children: [
           _buildSummaryCard(),
+
+          // CAMPO DE PESQUISA
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Pesquisar despesas...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+          ),
+
+          // BOTÕES DE ORDENAÇÃO
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                const Text('Ordenar por:'),
+                const SizedBox(width: 12),
+                ChoiceChip(
+                  label: const Text('Data'),
+                  selected: _sortCriteria == 'data',
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() {
+                        _sortCriteria = 'data';
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Descrição'),
+                  selected: _sortCriteria == 'descricao',
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() {
+                        _sortCriteria = 'descricao';
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
           TabBar(
             controller: _tabController,
             tabs: _categories.map((c) => Tab(text: _categoryLabels[c])).toList(),
