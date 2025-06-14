@@ -80,8 +80,6 @@ flutter run
 
 - Este projeto ainda está em desenvolvimento.
 
-- Não há backend implementado no momento (os dados não são persistidos permanentemente).
-
 - Próximos passos incluem: integração com banco de dados local, autenticação real e integração com agentes de IA para orientar usuários com base no perfil financeiro.
 
 ## 👩‍💻 Autor
