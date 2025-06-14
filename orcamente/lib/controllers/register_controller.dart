@@ -96,7 +96,7 @@ class RegisterController extends ChangeNotifier {
     final stopwatch = Stopwatch()..start();
 
     await FirebaseFirestore.instance
-        .collection('usuarios')
+        .collection('users')
         .doc(userCredential.user!.uid)
         .set({
           'nome': nameController.text.trim(),

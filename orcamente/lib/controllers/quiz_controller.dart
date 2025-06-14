@@ -81,7 +81,7 @@ class QuizController {
       };
 
       await FirebaseFirestore.instance
-          .collection('quiz_respostas')
+          .collection('quiz_answers')
           .doc(user.uid)
           .set(dataToSave);
 

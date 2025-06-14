@@ -33,7 +33,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final docRef = _firestore.collection('piggyBanks').doc(user.uid);
+    final docRef = _firestore.collection('piggy_banks').doc(user.uid);
     final docSnapshot = await docRef.get();
 
     if (docSnapshot.exists) {
@@ -52,7 +52,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Usuário não autenticado');
 
-    final docRef = _firestore.collection('piggyBanks').doc(user.uid);
+    final docRef = _firestore.collection('piggy_banks').doc(user.uid);
 
     await docRef.set({
       'amount': amount,
