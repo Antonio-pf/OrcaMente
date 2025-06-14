@@ -22,6 +22,23 @@
 
 ---
 
+## ☁️ Integração com Firebase
+
+O projeto utiliza o **Firebase** para armazenamento e gerenciamento de dados:
+
+- 🔥 **Firebase Firestore**
+  - Armazenamento de despesas por categoria (`essencial`, `lazer`, `outros`)
+  - Respostas do quiz financeiro
+  - Dados de usuários cadastrados
+
+- 🔐 **Firebase Authentication**
+  - Autenticação via e-mail e senha
+  - Reset de senha via e-mail
+
+- 📦 Para configurar, crie seu projeto no [Firebase Console](https://console.firebase.google.com), ative Authentication e Firestore, e insira o `google-services.json` no diretório `android/app`.
+
+---
+
 ## 🎯 Tecnologias utilizadas
 
 - **Flutter** (SDK principal)
@@ -33,6 +50,8 @@
   - `device_preview` – Preview em múltiplos dispositivos
   - `lucide_icons` – Ícones modernos
   - `flutter_multi_formatter` – Formatação de moeda e números
+  - `firebase_core` – Inicialização do Firebase
+  - `firebase_auth` – Autenticação de usuários
 
 ---
 
