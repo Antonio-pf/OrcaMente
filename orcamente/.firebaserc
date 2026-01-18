@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "winter-dynamics-410903",
+    "app-orcamente": "app-orcamente"
+  },
+  "targets": {},
+  "etags": {}
+}

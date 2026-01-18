@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:orcamente/services/auth_service.dart';
 
 class ForgotPasswordController extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
+  final AuthService _authService;
+  
   String errorMessage = '';
   String successMessage = '';
   bool isLoading = false;
+
+  ForgotPasswordController({AuthService? authService})
+      : _authService = authService ?? AuthService();
 
   bool validateEmail() {
     String email = emailController.text.trim();
@@ -41,30 +47,18 @@ class ForgotPasswordController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await FirebaseAuth.instance
-          .sendPasswordResetEmail(email: emailController.text.trim());
+      // Usar AuthService ao invés de FirebaseAuth direto
+      await _authService.sendPasswordResetEmail(emailController.text.trim());
 
       errorMessage = '';
       successMessage = 'Link de recuperação enviado para seu e-mail.';
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'user-not-found':
-          errorMessage = 'Usuário não encontrado com esse e-mail.';
-          break;
-        case 'invalid-email':
-          errorMessage = 'E-mail inválido.';
-          break;
-        default:
-          errorMessage = 'Erro: ${e.message}';
-      }
-      successMessage = '';
     } catch (e) {
-      errorMessage = 'Erro inesperado.';
+      errorMessage = e.toString();
       successMessage = '';
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-
-    isLoading = false;
-    notifyListeners();
   }
 
   void clearMessages() {

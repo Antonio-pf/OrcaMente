@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:orcamente/services/auth_service.dart';
 
 class RegisterController extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
@@ -9,9 +9,13 @@ class RegisterController extends ChangeNotifier {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  final AuthService _authService;
 
   String errorMessage = '';
   bool isLoading = false;
+
+  RegisterController({AuthService? authService})
+      : _authService = authService ?? AuthService();
 
   void _setLoading(bool value) {
     isLoading = value;
@@ -72,71 +76,35 @@ class RegisterController extends ChangeNotifier {
   }
 
   
-   Future<bool> registerUser() async {
-  print('registerUser iniciado');
-
-  if (!validateRegistration()) {
-    print('Validação falhou: $errorMessage');
-    return false;
-  }
-
-  _setLoading(true);
-  _setError('');
-
-  try {
-    print('Tentando criar usuário no FirebaseAuth');
-    UserCredential userCredential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text,
-        );
-    print('Usuário criado: ${userCredential.user?.uid}');
-
-    print('Salvando dados no Firestore');
-    final stopwatch = Stopwatch()..start();
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(userCredential.user!.uid)
-        .set({
-          'nome': nameController.text.trim(),
-          'email': emailController.text.trim(),
-          'telefone': phoneController.text.trim(),
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-
-    stopwatch.stop();
-    print(
-      'Dados salvos no Firestore em ${stopwatch.elapsedMilliseconds} ms',
-    );
-
-    return true;
-  } on FirebaseAuthException catch (e) {
-    print('FirebaseAuthException: ${e.code}');
-    switch (e.code) {
-      case 'email-already-in-use':
-        _setError('Este e-mail já está sendo usado.');
-        break;
-      case 'invalid-email':
-        _setError('Email inválido.');
-        break;
-      case 'operation-not-allowed':
-        _setError('Operação não permitida.');
-        break;
-      case 'weak-password':
-        _setError('Senha muito fraca.');
-        break;
-      default:
-        _setError('Erro: ${e.message}');
+  Future<bool> registerUser() async {
+    if (!validateRegistration()) {
+      return false;
     }
-    return false;
-  } catch (e) {
-    print('Erro inesperado: $e');
-    _setError('Erro inesperado.');
-    return false;
-  } finally {
-    _setLoading(false);
+
+    _setLoading(true);
+    _setError('');
+
+    try {
+      // Usar AuthService ao invés de chamadas diretas ao Firebase
+      final user = await _authService.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+      );
+
+      if (user == null) {
+        _setError('Falha ao criar conta. Tente novamente.');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      _setError(e.toString());
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
-}
 
 }
