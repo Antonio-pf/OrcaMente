@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orcamente/services/auth_service.dart';
+import 'package:orcamente/core/validators.dart';
 
+/// Controller for forgot password screen
+/// Handles password recovery using AuthService and Result<T> pattern
 class ForgotPasswordController extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final AuthService _authService;
@@ -13,18 +15,14 @@ class ForgotPasswordController extends ChangeNotifier {
   ForgotPasswordController({AuthService? authService})
       : _authService = authService ?? AuthService();
 
+  /// Validates email using centralized validator
   bool validateEmail() {
     String email = emailController.text.trim();
 
-    if (email.isEmpty) {
-      errorMessage = 'O e-mail é obrigatório.';
-      successMessage = '';
-      notifyListeners();
-      return false;
-    }
-
-    if (!_isValidEmail(email)) {
-      errorMessage = 'E-mail inválido.';
+    // Use centralized validator
+    final emailError = Validators.validateEmail(email);
+    if (emailError != null) {
+      errorMessage = emailError;
       successMessage = '';
       notifyListeners();
       return false;
@@ -35,35 +33,44 @@ class ForgotPasswordController extends ChangeNotifier {
     return true;
   }
 
-  bool _isValidEmail(String email) {
-    return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-        .hasMatch(email);
-  }
-
+  /// Sends password recovery email using AuthService with Result<T> pattern
   Future<void> recoverPassword() async {
     if (!validateEmail()) return;
 
     isLoading = true;
     notifyListeners();
 
-    try {
-      // Usar AuthService ao invés de FirebaseAuth direto
-      await _authService.sendPasswordResetEmail(emailController.text.trim());
+    // Use AuthService with Result<T> pattern
+    final result = await _authService.sendPasswordResetEmail(
+      emailController.text.trim(),
+    );
 
-      errorMessage = '';
-      successMessage = 'Link de recuperação enviado para seu e-mail.';
-    } catch (e) {
-      errorMessage = e.toString();
-      successMessage = '';
-    } finally {
-      isLoading = false;
-      notifyListeners();
-    }
+    // Handle result
+    result.when(
+      success: (_) {
+        errorMessage = '';
+        successMessage = 'Link de recuperação enviado para seu e-mail.';
+        isLoading = false;
+        notifyListeners();
+      },
+      failure: (error, exception) {
+        errorMessage = error;
+        successMessage = '';
+        isLoading = false;
+        notifyListeners();
+      },
+    );
   }
 
   void clearMessages() {
     errorMessage = '';
     successMessage = '';
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
   }
 }

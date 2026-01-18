@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orcamente/services/auth_service.dart';
+import 'package:orcamente/core/validators.dart';
 
+/// Controller for registration screen
+/// Handles user registration using AuthService and Result<T> pattern
 class RegisterController extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -27,6 +29,7 @@ class RegisterController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Validates all registration fields using centralized validators
   bool validateRegistration() {
     String name = nameController.text.trim();
     String email = emailController.text.trim();
@@ -34,29 +37,38 @@ class RegisterController extends ChangeNotifier {
     String password = passwordController.text;
     String confirmPassword = confirmPasswordController.text;
 
-    if (name.isEmpty ||
-        email.isEmpty ||
-        phone.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
-      _setError('Todos os campos precisam ser preenchidos.');
+    // Validate name
+    final nameError = Validators.validateName(name);
+    if (nameError != null) {
+      _setError(nameError);
       return false;
     }
 
-    if (!_isValidEmail(email)) {
-      _setError('Email inválido.');
+    // Validate email
+    final emailError = Validators.validateEmail(email);
+    if (emailError != null) {
+      _setError(emailError);
       return false;
     }
 
-    if (!_isValidPassword(password)) {
-      _setError(
-        'Senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas e caracteres especiais.',
-      );
+    // Validate phone
+    final phoneError = Validators.validatePhone(phone);
+    if (phoneError != null) {
+      _setError(phoneError);
       return false;
     }
 
-    if (password != confirmPassword) {
-      _setError('As senhas não coincidem.');
+    // Validate password
+    final passwordError = Validators.validatePassword(password);
+    if (passwordError != null) {
+      _setError(passwordError);
+      return false;
+    }
+
+    // Validate password confirmation
+    final confirmError = Validators.validatePasswordConfirmation(password, confirmPassword);
+    if (confirmError != null) {
+      _setError(confirmError);
       return false;
     }
 
@@ -64,18 +76,7 @@ class RegisterController extends ChangeNotifier {
     return true;
   }
 
-  bool _isValidEmail(String email) {
-    return RegExp(
-      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-    ).hasMatch(email);
-  }
-
-  bool _isValidPassword(String password) {
-    final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
-    return regex.hasMatch(password);
-  }
-
-  
+  /// Registers new user using AuthService with Result<T> pattern
   Future<bool> registerUser() async {
     if (!validateRegistration()) {
       return false;
@@ -84,27 +85,35 @@ class RegisterController extends ChangeNotifier {
     _setLoading(true);
     _setError('');
 
-    try {
-      // Usar AuthService ao invés de chamadas diretas ao Firebase
-      final user = await _authService.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text,
-        name: nameController.text.trim(),
-        phone: phoneController.text.trim(),
-      );
+    // Use AuthService with Result<T> pattern
+    final result = await _authService.createUserWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text,
+      name: nameController.text.trim(),
+      phone: phoneController.text.trim(),
+    );
 
-      if (user == null) {
-        _setError('Falha ao criar conta. Tente novamente.');
+    // Handle result
+    return result.when(
+      success: (user) {
+        _setLoading(false);
+        return true;
+      },
+      failure: (error, exception) {
+        _setError(error);
+        _setLoading(false);
         return false;
-      }
-
-      return true;
-    } catch (e) {
-      _setError(e.toString());
-      return false;
-    } finally {
-      _setLoading(false);
-    }
+      },
+    );
   }
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 }
