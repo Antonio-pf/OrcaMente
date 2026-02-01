@@ -102,13 +102,15 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-    return await piggyBankResult.when(
+      return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
           name: piggyBank.name,
           goal: piggyBank.goal,
           saved: piggyBank.saved + amount,
+          createdAt: piggyBank.createdAt,
+          updatedAt: DateTime.now(),
         );
 
         final updateResult = await updatePiggyBank(updatedPiggyBank);
@@ -134,7 +136,7 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-    return await piggyBankResult.when(
+      return await piggyBankResult.when(
       success: (piggyBank) async {
         if (piggyBank.saved < amount) {
           return Failure(
@@ -148,6 +150,8 @@ class PiggyBankRepository {
           name: piggyBank.name,
           goal: piggyBank.goal,
           saved: piggyBank.saved - amount,
+          createdAt: piggyBank.createdAt,
+          updatedAt: DateTime.now(),
         );
 
         final updateResult = await updatePiggyBank(updatedPiggyBank);
@@ -173,13 +177,15 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-    return await piggyBankResult.when(
+      return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
           name: piggyBank.name,
           goal: newGoal,
           saved: piggyBank.saved,
+          createdAt: piggyBank.createdAt,
+          updatedAt: DateTime.now(),
         );
 
         final updateResult = await updatePiggyBank(updatedPiggyBank);
@@ -198,13 +204,15 @@ class PiggyBankRepository {
   Future<Result<PiggyBankModel>> resetPiggyBank() async {
     final piggyBankResult = await getPiggyBank();
 
-    return await piggyBankResult.when(
+      return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
           name: piggyBank.name,
           goal: piggyBank.goal,
           saved: 0.0,
+          createdAt: piggyBank.createdAt,
+          updatedAt: DateTime.now(),
         );
 
         final updateResult = await updatePiggyBank(updatedPiggyBank);
@@ -267,6 +275,7 @@ class PiggyBankRepository {
         name: 'Meu Cofrinho',
         goal: goal,
         saved: currentAmount,
+        createdAt: DateTime.now(),
       );
 
       // Save to Firestore
@@ -288,6 +297,7 @@ class PiggyBankRepository {
         name: 'Meu Cofrinho',
         goal: 500.0,
         saved: 0.0,
+        createdAt: DateTime.now(),
       );
 
       final saveResult = await updatePiggyBank(piggyBank);

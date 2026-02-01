@@ -276,37 +276,8 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                     ),
                   ),
                   
-                  // Pontuação
-                  ValueListenableBuilder<int>(
-                    valueListenable: _controller.score,
-                    builder: (_, score, __) {
-                      return Positioned(
-                        top: 40,
-                        left: 20,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.amber[700], size: 24),
-                              const SizedBox(width: 8),
-                              Text(
-                                score.toString(),
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  // Pontuação e combo
+                  _buildScoreAndCombo(),
                 ],
               ),
             ),
@@ -390,7 +361,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
   Widget _buildParallaxBackground(double screenWidth, double screenHeight) {
     return Stack(
       children: [
-        // Céu
+        // Céu com gradiente animado
         Container(
           width: double.infinity,
           height: double.infinity,
@@ -402,81 +373,6 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
             ),
           ),
         ),
-        
-        /*
-        // Nuvens distantes (movimento lento)
-        ValueListenableBuilder(
-          valueListenable: _controller.backgroundX1,
-          builder: (_, x1, __) {
-            return Positioned(
-              left: x1 / 3, // Movimento mais lento para criar efeito de profundidade
-              top: screenHeight * 0.1,
-              child: Image.asset(
-                'assets/images/clouds.',
-                width: screenWidth * 1.5,
-                height: screenHeight * 0.3,
-                fit: BoxFit.contain,
-              ),
-            );
-          },
-        ),
-        */
-        // Prédios de fundo (movimento médio) tratar imagem e fundo
-        /*
-        ValueListenableBuilder(
-          valueListenable: _controller.backgroundX1,
-          builder: (_, x1, __) {
-            return Positioned(
-              left: x1 / 1.5,
-              bottom: 80,
-              child: Image.asset(
-                'assets/images/florest.jpg',
-                width: screenWidth * 1.5,
-                height: screenHeight * 0.4,
-                fit: BoxFit.contain,
-              ),
-            );
-          },
-        ),
-        */
-
-        /*
-        // Prédios de frente (movimento rápido)
-        ValueListenableBuilder(
-          valueListenable: _controller.backgroundX1,
-          builder: (_, x1, __) {
-            return Positioned(
-              left: x1,
-              bottom: 80,
-              child: Image.asset(
-                'assets/images/city_foreground.png',
-                width: screenWidth * 1.5,
-                height: screenHeight * 0.3,
-                fit: BoxFit.contain,
-              ),
-            );
-          },
-        ),
-        
-        */
-        /*
-        // Segunda cópia para movimento contínuo
-        ValueListenableBuilder(
-          valueListenable: _controller.backgroundX2,
-          builder: (_, x2, __) {
-            return Positioned(
-              left: x2,
-              bottom: 80,
-              child: Image.asset(
-                'assets/images/city_foreground.png',
-                width: screenWidth * 1.5,
-                height: screenHeight * 0.3,
-                fit: BoxFit.contain,
-              ),
-            );
-          },
-        ),
-        */
       ],
     );
   }
@@ -532,6 +428,8 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
           child: PlayerCharacter(
             animationController: _playerAnimController,
             isJumping: _controller.isJumping,
+            hasShield: _controller.hasShield,
+            hasSpeedBoost: _controller.hasSpeedBoost,
           ),
         );
       },
@@ -567,11 +465,113 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
     );
   }
 
+  Widget _buildScoreAndCombo() {
+    return ValueListenableBuilder<int>(
+      valueListenable: _controller.score,
+      builder: (_, score, __) {
+        final combo = _controller.combo;
+        return Positioned(
+          top: 40,
+          left: 20,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Pontuação
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber[700], size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      score.toString(),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Combo (só mostra se combo > 0)
+              if (combo > 0) ...[
+                const SizedBox(height: 8),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.8, end: 1.0),
+                  duration: const Duration(milliseconds: 200),
+                  builder: (context, scale, child) {
+                    return Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.orange[600]!, Colors.deepOrange[400]!],
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.orange.withOpacity(0.5),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.local_fire_department, color: Colors.white, size: 18),
+                            const SizedBox(width: 4),
+                            Text(
+                              'COMBO x$combo',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildFeedbackText() {
     return ValueListenableBuilder(
       valueListenable: _controller.feedbackText,
       builder: (_, feedback, __) {
         if (feedback.isEmpty) return const SizedBox.shrink();
+        
+        // Determinar cor baseado no conteúdo do feedback
+        Color backgroundColor;
+        if (feedback.contains("-") || feedback.contains("💥")) {
+          backgroundColor = Colors.red.withOpacity(0.9);
+        } else if (feedback.contains("🎯") || feedback.contains("✨") || feedback.contains("🛡️") || feedback.contains("⚡")) {
+          backgroundColor = Colors.green.withOpacity(0.9);
+        } else {
+          backgroundColor = Colors.blue.withOpacity(0.9);
+        }
         
         return Positioned(
           top: 160,
@@ -586,20 +586,29 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                   opacity: value,
                   child: Transform.translate(
                     offset: Offset(0, 20 * (1 - value)),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: feedback.contains("-") 
-                            ? Colors.red.withOpacity(0.8)
-                            : Colors.green.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        feedback,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    child: Transform.scale(
+                      scale: 0.8 + (0.2 * value),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: backgroundColor,
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          feedback,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

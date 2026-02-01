@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/controllers/quiz_controller.dart';
+import 'package:orcamente/repositories/user_repository.dart';
 import 'package:orcamente/views/quiz/quiz_result.dart';
 import '../../../styles/custom_theme.dart';
 
@@ -11,10 +12,16 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-  final QuizController _controller = QuizController();
+  late final QuizController _controller;
   final List<int> _selectedOptions = [];
 
   bool _isSaving = false; // Para evitar múltiplas chamadas
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = QuizController(UserRepository());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,33 +31,36 @@ class _QuizPageState extends State<QuizPage> {
         _isSaving = true;
 
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          bool saved = await _controller.saveAnswers();
+          final result = await _controller.saveAnswers();
 
           if (!mounted) return;
 
-          if (saved) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => QuizResultPage(
-                  profile: _controller.getBehaviorProfile(),
-                  knowledge: _controller.getKnowledgeLevel(),
+          result.when(
+            success: (_) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => QuizResultPage(
+                    profile: _controller.getBehaviorProfile(),
+                    knowledge: _controller.getKnowledgeLevel(),
+                  ),
                 ),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Falha ao salvar respostas. Tente novamente.')),
-            );
+              );
+            },
+            failure: (error, exception) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Falha ao salvar respostas: $error')),
+              );
 
-            // Aqui você pode decidir voltar para alguma etapa ou permitir tentar de novo
-            setState(() {
-              _isSaving = false;
-              _controller.currentStep = 0;
-              _controller.totalScore = 0;
-              _controller.selectedOptions.clear();
-            });
-          }
+              // Aqui você pode decidir voltar para alguma etapa ou permitir tentar de novo
+              setState(() {
+                _isSaving = false;
+                _controller.currentStep = 0;
+                _controller.totalScore = 0;
+                _controller.selectedOptions.clear();
+              });
+            },
+          );
         });
       }
 

@@ -3,6 +3,7 @@ import 'package:orcamente/components/widgets/custom_text_field.dart';
 import 'package:orcamente/components/widgets/expense/summary_card.dart';
 import 'package:orcamente/components/widgets/shimmer_list.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
+import 'package:orcamente/repositories/expense_repository.dart';
 import 'package:orcamente/models/expense.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 
@@ -16,7 +17,7 @@ class ExpensePage extends StatefulWidget {
 class _ExpensePageViewState extends State<ExpensePage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  final ExpenseController _controller = ExpenseController();
+  late final ExpenseController _controller;
 
   final List<String> _categories = ['essencial', 'lazer', 'outros'];
   final Map<String, String> _categoryLabels = {
@@ -39,23 +40,26 @@ class _ExpensePageViewState extends State<ExpensePage>
   @override
   void initState() {
     super.initState();
+    _controller = ExpenseController(ExpenseRepository());
     _tabController = TabController(length: _categories.length, vsync: this);
     _loadExpenses();
   }
 
   Future<void> _loadExpenses() async {
-    try {
-      await _controller.fetchExpenses();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar despesas: $e')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    final result = await _controller.fetchExpenses();
+    
+    if (mounted) {
+      result.when(
+        success: (_) {
+          setState(() => _isLoading = false);
+        },
+        failure: (error, exception) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao carregar despesas: $error')),
+          );
+        },
+      );
     }
   }
 
@@ -167,22 +171,26 @@ class _ExpensePageViewState extends State<ExpensePage>
                             return;
                           }
 
-                          try {
-                            await _controller.addExpense(desc, value, category);
-                            Navigator.pop(context);
-                            setState(() {}); // Atualiza lista
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Despesa adicionada com sucesso!'),
-                                backgroundColor: Colors.green,
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          } catch (e) {
-                            setModalState(() {
-                              errorText = 'Erro ao salvar despesa: $e';
-                            });
-                          }
+                          final result = await _controller.addExpense(desc, value, category);
+                          
+                          result.when(
+                            success: (_) {
+                              Navigator.pop(context);
+                              setState(() {}); // Atualiza lista
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Despesa adicionada com sucesso!'),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                            failure: (error, exception) {
+                              setModalState(() {
+                                errorText = 'Erro ao salvar despesa: $error';
+                              });
+                            },
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: CustomTheme.primaryColor,

@@ -58,7 +58,7 @@ class LoginController extends ChangeNotifier {
       success: (user) async {
         // Check if quiz was answered
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        bool quizAnswered = prefs.getBool('quizAnswered') ?? true;
+        bool quizAnswered = prefs.getBool('quizAnswered') ?? false;
 
         isLoading = false;
         notifyListeners();
