@@ -14,7 +14,8 @@ class EndlessRunnerGame extends StatefulWidget {
   State<EndlessRunnerGame> createState() => _EndlessRunnerGameState();
 }
 
-class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProviderStateMixin {
+class _EndlessRunnerGameState extends State<EndlessRunnerGame>
+    with TickerProviderStateMixin {
   late GameController _controller;
   late AnimationController _playerAnimController;
   bool _showTutorial = true;
@@ -25,12 +26,12 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
   void initState() {
     super.initState();
     _controller = GameController();
-    
+
     _playerAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     )..repeat(reverse: true);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final screenWidth = MediaQuery.of(context).size.width;
       final screenHeight = MediaQuery.of(context).size.height;
@@ -42,7 +43,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
     if (dinheiro < 0 && !_gameOverShown) {
       _gameOverShown = true;
       _controller.stop();
-      
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
 
@@ -87,10 +88,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                     const SizedBox(height: 16),
                     const Text(
                       "Você ficou sem dinheiro!",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 12),
@@ -128,7 +126,10 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: Colors.red.shade700,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                         ElevatedButton.icon(
@@ -141,7 +142,10 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withOpacity(0.3),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -193,7 +197,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
         children: [
           // Fundo do jogo com paralaxe
           _buildParallaxBackground(screenWidth, screenHeight),
-          
+
           // Área de jogo principal
           GestureDetector(
             onTap: _handleJump,
@@ -206,13 +210,13 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                 children: [
                   // Obstáculos (dívidas)
                   _buildObstacles(),
-                  
+
                   // Promoções (etiquetas educativas)
                   _buildPromotions(),
-                  
+
                   // Jogador
                   _buildPlayer(),
-                  
+
                   // Chão
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -247,13 +251,13 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                       ),
                     ),
                   ),
-                  
+
                   // Barra de status com dinheiro, felicidade, conhecimento
                   _buildStatsBar(),
-                  
+
                   // Texto de feedback
                   _buildFeedbackText(),
-                  
+
                   // Botão de pausa
                   Positioned(
                     top: 40,
@@ -275,14 +279,14 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                       ),
                     ),
                   ),
-                  
+
                   // Pontuação e combo
                   _buildScoreAndCombo(),
                 ],
               ),
             ),
           ),
-          
+
           // Tela de pausa
           if (_isPaused)
             Container(
@@ -309,7 +313,10 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         textStyle: const TextStyle(fontSize: 18),
                       ),
                     ),
@@ -343,7 +350,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                 ),
               ),
             ),
-          
+
           // Tutorial inicial
           if (_showTutorial)
             GameTutorial(
@@ -382,16 +389,17 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
       valueListenable: _controller.obstacles,
       builder: (_, obstacles, __) {
         return Stack(
-          children: obstacles.map((o) {
-            return Positioned(
-              left: o["x"],
-              bottom: 80,
-              child: Obstacle(
-                tipoDivida: o["label"] ?? "",
-                valor: o["valor"] ?? 100,
-              ),
-            );
-          }).toList(),
+          children:
+              obstacles.map((o) {
+                return Positioned(
+                  left: o["x"],
+                  bottom: 80,
+                  child: Obstacle(
+                    tipoDivida: o["label"] ?? "",
+                    valor: o["valor"] ?? 100,
+                  ),
+                );
+              }).toList(),
         );
       },
     );
@@ -402,17 +410,18 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
       valueListenable: _controller.promotions,
       builder: (_, promotions, __) {
         return Stack(
-          children: promotions.map((p) {
-            return Positioned(
-              left: p["x"],
-              bottom: p["y"] * MediaQuery.of(context).size.height,
-              child: PromotionWidget(
-                text: p["text"] ?? "",
-                value: p["value"] ?? 25,
-                collected: p["collected"] ?? false,
-              ),
-            );
-          }).toList(),
+          children:
+              promotions.map((p) {
+                return Positioned(
+                  left: p["x"],
+                  bottom: p["y"] * MediaQuery.of(context).size.height,
+                  child: PromotionWidget(
+                    text: p["text"] ?? "",
+                    value: p["value"] ?? 25,
+                    collected: p["collected"] ?? false,
+                  ),
+                );
+              }).toList(),
         );
       },
     );
@@ -478,7 +487,10 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
             children: [
               // Pontuação
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(20),
@@ -505,7 +517,7 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                   ],
                 ),
               ),
-              
+
               // Combo (só mostra se combo > 0)
               if (combo > 0) ...[
                 const SizedBox(height: 8),
@@ -516,10 +528,16 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                     return Transform.scale(
                       scale: scale,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.orange[600]!, Colors.deepOrange[400]!],
+                            colors: [
+                              Colors.orange[600]!,
+                              Colors.deepOrange[400]!,
+                            ],
                           ),
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
@@ -533,7 +551,11 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.local_fire_department, color: Colors.white, size: 18),
+                            const Icon(
+                              Icons.local_fire_department,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'COMBO x$combo',
@@ -562,17 +584,20 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
       valueListenable: _controller.feedbackText,
       builder: (_, feedback, __) {
         if (feedback.isEmpty) return const SizedBox.shrink();
-        
+
         // Determinar cor baseado no conteúdo do feedback
         Color backgroundColor;
         if (feedback.contains("-") || feedback.contains("💥")) {
           backgroundColor = Colors.red.withOpacity(0.9);
-        } else if (feedback.contains("🎯") || feedback.contains("✨") || feedback.contains("🛡️") || feedback.contains("⚡")) {
+        } else if (feedback.contains("🎯") ||
+            feedback.contains("✨") ||
+            feedback.contains("🛡️") ||
+            feedback.contains("⚡")) {
           backgroundColor = Colors.green.withOpacity(0.9);
         } else {
           backgroundColor = Colors.blue.withOpacity(0.9);
         }
-        
+
         return Positioned(
           top: 160,
           left: 0,
@@ -589,7 +614,10 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame> with TickerProvid
                     child: Transform.scale(
                       scale: 0.8 + (0.2 * value),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: backgroundColor,
                           borderRadius: BorderRadius.circular(25),

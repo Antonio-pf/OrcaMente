@@ -11,9 +11,6 @@ import 'package:orcamente/controllers/home_controller.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
 import 'package:orcamente/controllers/piggy_controller.dart';
 import 'package:orcamente/controllers/quiz_controller.dart';
-import 'package:orcamente/controllers/login_controller.dart';
-import 'package:orcamente/controllers/register_controller.dart';
-import 'package:orcamente/controllers/forget_password_controller.dart';
 
 import 'package:orcamente/services/auth_service.dart';
 import 'package:orcamente/services/firestore_service.dart';
@@ -39,9 +36,7 @@ void setupDependencies() {
 
   // Register Repositories (Singletons with dependencies)
   getIt.registerLazySingleton<UserRepository>(
-    () => UserRepository(
-      firestoreService: getIt<FirestoreService>(),
-    ),
+    () => UserRepository(firestoreService: getIt<FirestoreService>()),
   );
 
   getIt.registerLazySingleton<ExpenseRepository>(
@@ -60,46 +55,33 @@ void setupDependencies() {
 
   // Register Controllers that don't manage TextEditingControllers (Factories)
   getIt.registerFactory<HomeController>(
-    () => HomeController(
-      getIt<UserRepository>(),
-    ),
+    () => HomeController(getIt<UserRepository>()),
   );
 
   getIt.registerFactory<ExpenseController>(
-    () => ExpenseController(
-      getIt<ExpenseRepository>(),
-    ),
+    () => ExpenseController(getIt<ExpenseRepository>()),
   );
 
   getIt.registerFactory<PiggyBankController>(
-    () => PiggyBankController(
-      getIt<PiggyBankRepository>(),
-    ),
+    () => PiggyBankController(getIt<PiggyBankRepository>()),
   );
 
   getIt.registerFactory<QuizController>(
-    () => QuizController(
-      getIt<UserRepository>(),
-    ),
+    () => QuizController(getIt<UserRepository>()),
   );
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Setup dependency injection
   setupDependencies();
 
   runApp(
-    DevicePreview(
-      enabled: true,
-      builder: (context) => const AppProviders(),
-    ),
+    DevicePreview(enabled: true, builder: (context) => const AppProviders()),
   );
 }
 
@@ -112,7 +94,7 @@ class AppProviders extends StatelessWidget {
       providers: [
         // Theme controller (no dependencies)
         ChangeNotifierProvider(create: (_) => ThemeController()),
-        
+
         // Controllers with dependencies injected from GetIt
         // Note: Auth controllers (Login, Register, ForgotPassword) are created
         // in their respective pages because they manage TextEditingControllers

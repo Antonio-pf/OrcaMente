@@ -15,10 +15,7 @@ class UserProfileView extends StatelessWidget {
           const SizedBox(height: 24),
           const Text(
             'Progresso do Usuário',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
           LinearProgressIndicator(

@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
-    await Future.delayed(const Duration(seconds: 2)); 
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       _isLoading = false;
     });
@@ -91,7 +91,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final controller = context.watch<HomeController>();
-    final String title = _selectedIndex == 1 ? 'Para você' : controller.appBarTitle;
+    final String title =
+        _selectedIndex == 1 ? 'Para você' : controller.appBarTitle;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -101,21 +102,22 @@ class _HomePageState extends State<HomePage> {
         onAvatarTap: _onAvatarTap,
         onSettingsTap: _onSettingsTap,
       ),
-      body: _isLoading
-          ? const ShimmerPlaceholderList(itemCount:  4)
-          : AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: _showSettingsPage
-                  ? const SettingsPage()
-                  : _showUserPanel
-                      ? const UserProfileView()
-                      : _pages[_selectedIndex],
-            ),
+      body:
+          _isLoading
+              ? const ShimmerPlaceholderList(itemCount: 4)
+              : AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child:
+                    _showSettingsPage
+                        ? const SettingsPage()
+                        : _showUserPanel
+                        ? const UserProfileView()
+                        : _pages[_selectedIndex],
+              ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark
-              ? CustomTheme.neutralBlack
-              : CustomTheme.primaryVeryLight,
+          color:
+              isDark ? CustomTheme.neutralBlack : CustomTheme.primaryVeryLight,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
@@ -129,23 +131,18 @@ class _HomePageState extends State<HomePage> {
           onDestinationSelected: _onItemTapped,
           height: 70,
           backgroundColor: Colors.transparent,
-          indicatorColor: isDark
-              ? CustomTheme.primaryDark.withOpacity(0.2)
-              : CustomTheme.primaryColor.withOpacity(0.1),
+          indicatorColor:
+              isDark
+                  ? CustomTheme.primaryDark.withOpacity(0.2)
+                  : CustomTheme.primaryColor.withOpacity(0.1),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           destinations: const [
             NavigationDestination(
               icon: Icon(Icons.attach_money_rounded),
               label: 'Controle',
             ),
-            NavigationDestination(
-              icon: Icon(Icons.school),
-              label: 'Educação',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.history),
-              label: 'Extrato',
-            ),
+            NavigationDestination(icon: Icon(Icons.school), label: 'Educação'),
+            NavigationDestination(icon: Icon(Icons.history), label: 'Extrato'),
           ],
         ),
       ),

@@ -14,8 +14,8 @@ class ExpenseRepository {
   ExpenseRepository({
     FirestoreService? firestoreService,
     AuthService? authService,
-  })  : _firestoreService = firestoreService ?? FirestoreService(),
-        _authService = authService ?? AuthService();
+  }) : _firestoreService = firestoreService ?? FirestoreService(),
+       _authService = authService ?? AuthService();
 
   static const String _expensesCollection = 'expenses';
   static const String _itemsSubcollection = 'items';
@@ -39,16 +39,22 @@ class ExpenseRepository {
       collection: _expensesCollection,
       docId: uid,
       subcollection: _itemsSubcollection,
-      queryBuilder: (collection) =>
-          collection.orderBy('date', descending: true),
+      queryBuilder:
+          (collection) => collection.orderBy('date', descending: true),
     );
 
     return result.when(
       success: (docs) {
         try {
-          final expenses = docs
-              .map((doc) => Expense.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-              .toList();
+          final expenses =
+              docs
+                  .map(
+                    (doc) => Expense.fromMap(
+                      doc.id,
+                      doc.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
           return Success(expenses);
         } catch (e) {
           return Failure(
@@ -77,17 +83,24 @@ class ExpenseRepository {
       collection: _expensesCollection,
       docId: uid,
       subcollection: _itemsSubcollection,
-      queryBuilder: (collection) => collection
-          .where('category', isEqualTo: category)
-          .orderBy('date', descending: true),
+      queryBuilder:
+          (collection) => collection
+              .where('category', isEqualTo: category)
+              .orderBy('date', descending: true),
     );
 
     return result.when(
       success: (docs) {
         try {
-          final expenses = docs
-              .map((doc) => Expense.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-              .toList();
+          final expenses =
+              docs
+                  .map(
+                    (doc) => Expense.fromMap(
+                      doc.id,
+                      doc.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
           return Success(expenses);
         } catch (e) {
           return Failure(
@@ -133,15 +146,16 @@ class ExpenseRepository {
     );
 
     return result.when(
-      success: (docId) => Success(
-        Expense(
-          id: docId,
-          description: expense.description,
-          value: expense.value,
-          date: expense.date,
-          category: expense.category,
-        ),
-      ),
+      success:
+          (docId) => Success(
+            Expense(
+              id: docId,
+              description: expense.description,
+              value: expense.value,
+              date: expense.date,
+              category: expense.category,
+            ),
+          ),
       failure: (error, exception) => Failure(error, exception),
     );
   }
@@ -233,19 +247,24 @@ class ExpenseRepository {
           collection: _expensesCollection,
           docId: uid,
           subcollection: _itemsSubcollection,
-          queryBuilder: (collection) =>
-              collection.orderBy('date', descending: true),
+          queryBuilder:
+              (collection) => collection.orderBy('date', descending: true),
         )
         .map((docs) {
-      try {
-        return docs
-            .map((doc) => Expense.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        // Return empty list on error
-        return <Expense>[];
-      }
-    });
+          try {
+            return docs
+                .map(
+                  (doc) => Expense.fromMap(
+                    doc.id,
+                    doc.data() as Map<String, dynamic>,
+                  ),
+                )
+                .toList();
+          } catch (e) {
+            // Return empty list on error
+            return <Expense>[];
+          }
+        });
   }
 
   /// Stream expenses filtered by category
@@ -262,19 +281,25 @@ class ExpenseRepository {
           collection: _expensesCollection,
           docId: uid,
           subcollection: _itemsSubcollection,
-          queryBuilder: (collection) => collection
-              .where('category', isEqualTo: category)
-              .orderBy('date', descending: true),
+          queryBuilder:
+              (collection) => collection
+                  .where('category', isEqualTo: category)
+                  .orderBy('date', descending: true),
         )
         .map((docs) {
-      try {
-        return docs
-            .map((doc) => Expense.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-            .toList();
-      } catch (e) {
-        return <Expense>[];
-      }
-    });
+          try {
+            return docs
+                .map(
+                  (doc) => Expense.fromMap(
+                    doc.id,
+                    doc.data() as Map<String, dynamic>,
+                  ),
+                )
+                .toList();
+          } catch (e) {
+            return <Expense>[];
+          }
+        });
   }
 
   /// Calculate total expenses for current user
@@ -330,18 +355,28 @@ class ExpenseRepository {
       collection: _expensesCollection,
       docId: uid,
       subcollection: _itemsSubcollection,
-      queryBuilder: (collection) => collection
-          .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
-          .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
-          .orderBy('date', descending: true),
+      queryBuilder:
+          (collection) => collection
+              .where(
+                'date',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+              )
+              .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
+              .orderBy('date', descending: true),
     );
 
     return result.when(
       success: (docs) {
         try {
-          final expenses = docs
-              .map((doc) => Expense.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-              .toList();
+          final expenses =
+              docs
+                  .map(
+                    (doc) => Expense.fromMap(
+                      doc.id,
+                      doc.data() as Map<String, dynamic>,
+                    ),
+                  )
+                  .toList();
           return Success(expenses);
         } catch (e) {
           return Failure(

@@ -33,8 +33,8 @@ class CourseModulesPage extends StatelessWidget {
               title: module.title,
               icon: Icons.menu_book,
               onTap: () {
-               // ScaffoldMessenger.of(context).showSnackBar(
-                 // SnackBar(content: Text('Abrindo módulo: ${module.title}')),
+                // ScaffoldMessenger.of(context).showSnackBar(
+                // SnackBar(content: Text('Abrindo módulo: ${module.title}')),
                 //);
               },
             );

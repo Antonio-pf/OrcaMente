@@ -47,7 +47,7 @@ class _ExpensePageViewState extends State<ExpensePage>
 
   Future<void> _loadExpenses() async {
     final result = await _controller.fetchExpenses();
-    
+
     if (mounted) {
       result.when(
         success: (_) {
@@ -55,12 +55,36 @@ class _ExpensePageViewState extends State<ExpensePage>
         },
         failure: (error, exception) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erro ao carregar despesas: $error')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text('Erro ao carregar despesas: $error')),
+                  ],
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'TENTAR NOVAMENTE',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    setState(() => _isLoading = true);
+                    _loadExpenses();
+                  },
+                ),
+              ),
+            );
+          }
         },
       );
     }
+  }
+
+  Future<void> _refreshExpenses() async {
+    await _loadExpenses();
   }
 
   double _getTotalExpense(String category) {
@@ -82,14 +106,17 @@ class _ExpensePageViewState extends State<ExpensePage>
   List<Expense> _getFilteredExpenses(String category) {
     final expenses = _controller.getExpensesByCategory(category);
 
-    final filtered = expenses.where((e) {
-      final desc = e.description.toLowerCase();
-      final query = _searchQuery.toLowerCase();
-      return desc.contains(query);
-    }).toList();
+    final filtered =
+        expenses.where((e) {
+          final desc = e.description.toLowerCase();
+          final query = _searchQuery.toLowerCase();
+          return desc.contains(query);
+        }).toList();
 
     if (_sortCriteria == 'data') {
-      filtered.sort((a, b) => b.date.compareTo(a.date)); // mais recente primeiro
+      filtered.sort(
+        (a, b) => b.date.compareTo(a.date),
+      ); // mais recente primeiro
     } else if (_sortCriteria == 'descricao') {
       filtered.sort((a, b) => a.description.compareTo(b.description));
     }
@@ -137,7 +164,8 @@ class _ExpensePageViewState extends State<ExpensePage>
                       hintText: 'Descrição',
                       icon: Icons.edit,
                       onChanged: (_) {
-                        if (errorText != null) setModalState(() => errorText = null);
+                        if (errorText != null)
+                          setModalState(() => errorText = null);
                       },
                     ),
                     const SizedBox(height: 16),
@@ -146,7 +174,8 @@ class _ExpensePageViewState extends State<ExpensePage>
                       hintText: 'Valor',
                       icon: Icons.attach_money,
                       onChanged: (_) {
-                        if (errorText != null) setModalState(() => errorText = null);
+                        if (errorText != null)
+                          setModalState(() => errorText = null);
                       },
                     ),
                     if (errorText != null) ...[
@@ -162,24 +191,35 @@ class _ExpensePageViewState extends State<ExpensePage>
                       child: ElevatedButton.icon(
                         onPressed: () async {
                           final desc = descController.text.trim();
-                          final value = double.tryParse(valueController.text.replaceAll(',', '.')) ?? 0;
+                          final value =
+                              double.tryParse(
+                                valueController.text.replaceAll(',', '.'),
+                              ) ??
+                              0;
 
                           if (desc.isEmpty || value <= 0) {
                             setModalState(() {
-                              errorText = 'Preencha todos os campos corretamente.';
+                              errorText =
+                                  'Preencha todos os campos corretamente.';
                             });
                             return;
                           }
 
-                          final result = await _controller.addExpense(desc, value, category);
-                          
+                          final result = await _controller.addExpense(
+                            desc,
+                            value,
+                            category,
+                          );
+
                           result.when(
                             success: (_) {
                               Navigator.pop(context);
                               setState(() {}); // Atualiza lista
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Despesa adicionada com sucesso!'),
+                                  content: Text(
+                                    'Despesa adicionada com sucesso!',
+                                  ),
                                   backgroundColor: Colors.green,
                                   duration: Duration(seconds: 1),
                                 ),
@@ -252,85 +292,103 @@ class _ExpensePageViewState extends State<ExpensePage>
               'Nenhum gasto registrado',
               style: TextStyle(color: Colors.grey[600]),
             ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => _openAddExpenseModal(category),
+              icon: const Icon(Icons.add),
+              label: const Text('Adicionar primeiro gasto'),
+            ),
           ],
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: filteredExpenses.length,
-      itemBuilder: (context, index) {
-        final expense = filteredExpenses[index];
+    return RefreshIndicator(
+      onRefresh: _refreshExpenses,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: filteredExpenses.length,
+        itemBuilder: (context, index) {
+          final expense = filteredExpenses[index];
 
-        return Dismissible(
-          key: Key(expense.id),
-          background: Container(
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(12),
+          return Dismissible(
+            key: Key(expense.id),
+            background: Container(
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
             ),
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) async {
-            await _controller.removeExpense(expense.id);
-            setState(() {});
+            direction: DismissDirection.endToStart,
+            onDismissed: (direction) async {
+              await _controller.removeExpense(expense.id);
+              setState(() {});
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.delete_outline, color: Colors.white),
-                    const SizedBox(width: 8),
-                    const Expanded(child: Text('Despesa removida')),
-                  ],
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.delete_outline, color: Colors.white),
+                      const SizedBox(width: 8),
+                      const Expanded(child: Text('Despesa removida')),
+                    ],
+                  ),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.all(10),
+                  duration: const Duration(seconds: 3),
+                  action: SnackBarAction(
+                    label: 'DESFAZER',
+                    textColor: Colors.white,
+                    onPressed: () async {
+                      await _controller.undoRemoveExpense();
+                      setState(() {});
+                    },
+                  ),
                 ),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              );
+            },
+            child: Card(
+              elevation: 1,
+              margin: const EdgeInsets.only(bottom: 8),
+              color: _getCardColor(category),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
-                margin: const EdgeInsets.all(10),
-                duration: const Duration(seconds: 3),
-                action: SnackBarAction(
-                  label: 'DESFAZER',
-                  textColor: Colors.white,
-                  onPressed: () async {
-                    await _controller.undoRemoveExpense();
-                    setState(() {});
-                  },
+                title: Text(
+                  expense.description,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                subtitle: Text(
+                  '${expense.date.day}/${expense.date.month}/${expense.date.year}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+                trailing: Text(
+                  'R\$ ${expense.value.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
-            );
-          },
-          child: Card(
-            elevation: 1,
-            margin: const EdgeInsets.only(bottom: 8),
-            color: _getCardColor(category),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              title: Text(
-                expense.description,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              ),
-              subtitle: Text(
-                '${expense.date.day}/${expense.date.month}/${expense.date.year}',
-                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-              ),
-              trailing: Text(
-                'R\$ ${expense.value.toStringAsFixed(2)}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
@@ -359,16 +417,17 @@ class _ExpensePageViewState extends State<ExpensePage>
               decoration: InputDecoration(
                 hintText: 'Pesquisar despesas...',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
+                suffixIcon:
+                    _searchQuery.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                        : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -417,7 +476,8 @@ class _ExpensePageViewState extends State<ExpensePage>
 
           TabBar(
             controller: _tabController,
-            tabs: _categories.map((c) => Tab(text: _categoryLabels[c])).toList(),
+            tabs:
+                _categories.map((c) => Tab(text: _categoryLabels[c])).toList(),
             labelColor: Colors.green[700],
             unselectedLabelColor: Colors.grey[600],
             indicatorColor: Colors.green,

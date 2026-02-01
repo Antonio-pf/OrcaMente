@@ -36,7 +36,9 @@ class _MotivationCardState extends State<MotivationCard> {
     await Future.delayed(const Duration(milliseconds: 300));
 
     try {
-      final response = await http.get(Uri.parse('https://moraislucas.github.io/MeMotive/phrases.json'));
+      final response = await http.get(
+        Uri.parse('https://moraislucas.github.io/MeMotive/phrases.json'),
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -82,7 +84,7 @@ class _MotivationCardState extends State<MotivationCard> {
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
             child: Container(
-              key: ValueKey(quote), 
+              key: ValueKey(quote),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: CustomTheme.warningColor.withOpacity(0.1),
@@ -94,7 +96,10 @@ class _MotivationCardState extends State<MotivationCard> {
                 children: [
                   Row(
                     children: const [
-                      Icon(Icons.tips_and_updates, color: CustomTheme.warningColor),
+                      Icon(
+                        Icons.tips_and_updates,
+                        color: CustomTheme.warningColor,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'Dica do dia',
@@ -106,19 +111,15 @@ class _MotivationCardState extends State<MotivationCard> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    quote,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                  Text(quote, style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
                       author,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(fontStyle: FontStyle.italic),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ),
                 ],
@@ -129,9 +130,7 @@ class _MotivationCardState extends State<MotivationCard> {
             Positioned.fill(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-                child: Container(
-                  color: Colors.transparent,
-                ),
+                child: Container(color: Colors.transparent),
               ),
             ),
         ],

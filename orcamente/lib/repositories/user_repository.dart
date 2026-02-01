@@ -9,11 +9,9 @@ class UserRepository {
   final FirestoreService _firestoreService;
   final AuthService _authService;
 
-  UserRepository({
-    FirestoreService? firestoreService,
-    AuthService? authService,
-  })  : _firestoreService = firestoreService ?? FirestoreService(),
-        _authService = authService ?? AuthService();
+  UserRepository({FirestoreService? firestoreService, AuthService? authService})
+    : _firestoreService = firestoreService ?? FirestoreService(),
+      _authService = authService ?? AuthService();
 
   static const String _usersCollection = 'users';
   static const String _quizAnswersCollection = 'quiz_answers';
@@ -76,9 +74,7 @@ class UserRepository {
 
   /// Update current user's data
   /// Returns Result<void> indicating success or failure
-  Future<Result<void>> updateCurrentUserData(
-    Map<String, dynamic> data,
-  ) async {
+  Future<Result<void>> updateCurrentUserData(Map<String, dynamic> data) async {
     final uid = _currentUserId;
 
     if (uid == null) {

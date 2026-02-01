@@ -17,7 +17,9 @@ class GameController {
 
   final ValueNotifier<String> feedbackText = ValueNotifier("");
   final ValueNotifier<List<Map<String, dynamic>>> obstacles = ValueNotifier([]);
-  final ValueNotifier<List<Map<String, dynamic>>> promotions = ValueNotifier([]);
+  final ValueNotifier<List<Map<String, dynamic>>> promotions = ValueNotifier(
+    [],
+  );
 
   double? _screenWidth;
   double? _screenHeight;
@@ -33,7 +35,7 @@ class GameController {
   int _obstacleCounter = 0;
   int _scoreCounter = 0;
   Timer? _feedbackTimer;
-  
+
   // Power-ups e efeitos
   bool _hasShield = false;
   Timer? _shieldTimer;
@@ -41,7 +43,7 @@ class GameController {
   Timer? _speedBoostTimer;
   int _combo = 0;
   Timer? _comboTimer;
-  
+
   // Dificuldade progressiva
   final int _pointsPerLevel = 300;
   final double _speedIncreasePerLevel = 0.7;
@@ -82,16 +84,16 @@ class GameController {
 
     obstacles.value = [
       {
-        "x": screenWidth + 100.0, 
-        "label": "Conta de Luz", 
+        "x": screenWidth + 100.0,
+        "label": "Conta de Luz",
         "valor": 100,
-        "collided": false
+        "collided": false,
       },
       {
-        "x": screenWidth + 400.0, 
-        "label": "Empréstimo", 
+        "x": screenWidth + 400.0,
+        "label": "Empréstimo",
         "valor": 200,
-        "collided": false
+        "collided": false,
       },
     ];
 
@@ -124,12 +126,12 @@ class GameController {
     // Atualizar posição do jogador (pulo) com física melhorada
     if (isJumping) {
       velocity += gravity;
-      
+
       // Limitar velocidade de queda
       if (velocity > maxFallSpeed) {
         velocity = maxFallSpeed;
       }
-      
+
       playerY.value += velocity;
 
       if (playerY.value >= 0.82) {
@@ -142,30 +144,37 @@ class GameController {
 
     // Verificar colisões
     _checkCollisions();
-    
+
     // Atualizar pontuação
     _scoreCounter++;
-    if (_scoreCounter >= 30) { // A cada ~0.5 segundo
+    if (_scoreCounter >= 30) {
+      // A cada ~0.5 segundo
       score.value += 1;
       _scoreCounter = 0;
-      
+
       // Verificar aumento de dificuldade
       _checkDifficultyIncrease();
     }
   }
-  
+
   void _checkDifficultyIncrease() {
     int newLevel = (score.value / _pointsPerLevel).floor() + 1;
     if (newLevel > _difficultyLevel) {
       _difficultyLevel = newLevel;
-      
+
       // Calcular nova velocidade com boost temporário se ativo
-      double baseSpeed = min(_maxSpeed, _minSpeed + (_difficultyLevel - 1) * _speedIncreasePerLevel);
+      double baseSpeed = min(
+        _maxSpeed,
+        _minSpeed + (_difficultyLevel - 1) * _speedIncreasePerLevel,
+      );
       backgroundSpeed = _hasSpeedBoost ? baseSpeed * 0.7 : baseSpeed;
-      
+
       // Mostrar feedback de aumento de dificuldade
-      showFeedback("🎯 Nível $_difficultyLevel! Velocidade aumentada!", isPositive: true);
-      
+      showFeedback(
+        "🎯 Nível $_difficultyLevel! Velocidade aumentada!",
+        isPositive: true,
+      );
+
       // Recompensas por nível
       conhecimento.value = min(100, conhecimento.value + 5);
       dinheiro.value += 50 * _difficultyLevel;
@@ -175,7 +184,7 @@ class GameController {
 
   void _checkCollisions() {
     if (_screenWidth == null || _screenHeight == null) return;
-    
+
     double playerX = _screenWidth! * 0.15;
     const double playerWidth = 40;
     const double playerHeightPct = 0.15;
@@ -196,14 +205,20 @@ class GameController {
       // Reposicionar obstáculo quando sair da tela
       if (obstacle["x"] < -100) {
         _obstacleCounter++;
-        
+
         // Aumentar a distância entre obstáculos com base na dificuldade
         double baseDistance = 300;
         double randomVariation = _random.nextDouble() * 100;
-        double distanceMultiplier = max(0.7, 1.0 - (_difficultyLevel * 0.05)); // Diminui gradualmente
-        
-        obstacle["x"] = _screenWidth! + (baseDistance * distanceMultiplier) + randomVariation;
-        
+        double distanceMultiplier = max(
+          0.7,
+          1.0 - (_difficultyLevel * 0.05),
+        ); // Diminui gradualmente
+
+        obstacle["x"] =
+            _screenWidth! +
+            (baseDistance * distanceMultiplier) +
+            randomVariation;
+
         // Selecionar um tipo de dívida aleatório
         final selectedDebt = tiposDivida[_random.nextInt(tiposDivida.length)];
         obstacle["label"] = selectedDebt["label"];
@@ -226,7 +241,7 @@ class GameController {
 
       if (playerRect.overlaps(obstacleRect) && !obstacle["collided"]) {
         obstacle["collided"] = true;
-        
+
         if (_hasShield) {
           // Escudo absorve o impacto
           showFeedback("🛡️ Escudo protegeu você!", isPositive: true);
@@ -236,14 +251,14 @@ class GameController {
           int valor = obstacle["valor"] ?? 100;
           dinheiro.value -= valor;
           felicidade.value = max(0, felicidade.value - 10);
-          
+
           // Resetar combo
           _resetCombo();
-          
+
           // Feedback com o valor específico da dívida
           showFeedback("💥 Dívida: -R\$$valor", isPositive: false);
         }
-        
+
         // Efeito visual de colisão
         obstacle["hit"] = true;
       }
@@ -261,7 +276,8 @@ class GameController {
         promo["x"] = newPromo["x"];
         promo["y"] = newPromo["y"];
         promo["text"] = newPromo["text"];
-        promo["value"] = 25 + (_difficultyLevel * 5); // Valor aumenta com a dificuldade
+        promo["value"] =
+            25 + (_difficultyLevel * 5); // Valor aumenta com a dificuldade
         promo["collected"] = false;
       }
 
@@ -282,20 +298,20 @@ class GameController {
         if (promo["collected"] != true) {
           promo["collected"] = true;
           int value = promo["value"] ?? 25;
-          
+
           // Aumentar combo
           _incrementCombo();
-          
+
           // Aplicar multiplicador de combo
           int bonusValue = (value * (1 + _combo * 0.1)).round();
           dinheiro.value += bonusValue;
           conhecimento.value = min(100, conhecimento.value + 2);
           felicidade.value = min(100, felicidade.value + 5);
-          
+
           // Adicionar pontos extras com combo
           int bonusPoints = 10 * (1 + _combo);
           score.value += bonusPoints;
-          
+
           String comboText = _combo > 1 ? " (Combo x$_combo!)" : "";
           showFeedback("✨ Dica: +R\$$bonusValue$comboText", isPositive: true);
         }
@@ -306,65 +322,68 @@ class GameController {
 
   void showFeedback(String message, {bool isPositive = false}) {
     feedbackText.value = message;
-    
+
     // Cancelar timer anterior se existir
     _feedbackTimer?.cancel();
-    
+
     // Definir novo timer para limpar o feedback após 2 segundos
     _feedbackTimer = Timer(const Duration(milliseconds: 2000), () {
       feedbackText.value = "";
     });
   }
-  
+
   void _incrementCombo() {
     _combo++;
     _comboTimer?.cancel();
-    
+
     // Resetar combo após 3 segundos sem coletar
     _comboTimer = Timer(const Duration(seconds: 3), () {
       _resetCombo();
     });
   }
-  
+
   void _resetCombo() {
     _combo = 0;
     _comboTimer?.cancel();
   }
-  
+
   void activateShield() {
     _hasShield = true;
     showFeedback("🛡️ Escudo ativado!", isPositive: true);
-    
+
     _shieldTimer?.cancel();
     _shieldTimer = Timer(const Duration(seconds: 10), () {
       _removeShield();
     });
   }
-  
+
   void _removeShield() {
     _hasShield = false;
     _shieldTimer?.cancel();
   }
-  
+
   void activateSpeedBoost() {
     _hasSpeedBoost = true;
     backgroundSpeed *= 0.7; // Reduz velocidade em 30%
     showFeedback("⚡ Slow Motion ativado!", isPositive: true);
-    
+
     _speedBoostTimer?.cancel();
     _speedBoostTimer = Timer(const Duration(seconds: 8), () {
       _removeSpeedBoost();
     });
   }
-  
+
   void _removeSpeedBoost() {
     if (_hasSpeedBoost) {
       _hasSpeedBoost = false;
-      backgroundSpeed = min(_maxSpeed, _minSpeed + (_difficultyLevel - 1) * _speedIncreasePerLevel);
+      backgroundSpeed = min(
+        _maxSpeed,
+        _minSpeed + (_difficultyLevel - 1) * _speedIncreasePerLevel,
+      );
       _speedBoostTimer?.cancel();
     }
   }
-  
+
   bool get hasShield => _hasShield;
   bool get hasSpeedBoost => _hasSpeedBoost;
   int get combo => _combo;
@@ -413,16 +432,16 @@ class GameController {
 
     obstacles.value = [
       {
-        "x": screenWidth + 100.0, 
-        "label": "Conta de Luz", 
+        "x": screenWidth + 100.0,
+        "label": "Conta de Luz",
         "valor": 100,
-        "collided": false
+        "collided": false,
       },
       {
-        "x": screenWidth + 400.0, 
-        "label": "Empréstimo", 
+        "x": screenWidth + 400.0,
+        "label": "Empréstimo",
         "valor": 200,
-        "collided": false
+        "collided": false,
       },
     ];
 
@@ -430,7 +449,7 @@ class GameController {
       generatePromotion(screenWidth),
       generatePromotion(screenWidth + 450),
     ];
-        
+
     // Inicia novamente o jogo
     start(screenWidth, screenHeight);
   }

@@ -52,50 +52,56 @@ class _CourseListPageState extends State<CourseListPage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green
+                  color: Colors.green,
                 ),
               ),
             ),
             const SizedBox(height: 24),
 
             Expanded(
-              child: _isLoading
-                  ? const ShimmerPlaceholderList(itemCount: 3, itemHeight: 100)
-                  : ListView(
-                      children: [
-                        ...courses.map((course) {
-                          final icon = getCourseIcon(course.title);
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: CustomCourseCard(
-                              title: course.title,
-                              icon: icon,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CourseModulesPage(course: course),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        }).toList(),
-
-                        CustomCourseCard(
-                          title: 'Aprenda Jogando',
-                          icon: Icons.videogame_asset,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => EndlessRunnerGame(),
+              child:
+                  _isLoading
+                      ? const ShimmerPlaceholderList(
+                        itemCount: 3,
+                        itemHeight: 100,
+                      )
+                      : ListView(
+                        children: [
+                          ...courses.map((course) {
+                            final icon = getCourseIcon(course.title);
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: CustomCourseCard(
+                                title: course.title,
+                                icon: icon,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              CourseModulesPage(course: course),
+                                    ),
+                                  );
+                                },
                               ),
                             );
-                          },
-                        ),
-                      ],
-                    ),
+                          }).toList(),
+
+                          CustomCourseCard(
+                            title: 'Aprenda Jogando',
+                            icon: Icons.videogame_asset,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EndlessRunnerGame(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
             ),
           ],
         ),

@@ -28,10 +28,7 @@ sealed class Result<T> {
         return Failure('Error transforming data: $e', Exception(e.toString()));
       }
     }
-    return Failure(
-      (this as Failure<T>).error,
-      (this as Failure<T>).exception,
-    );
+    return Failure((this as Failure<T>).error, (this as Failure<T>).exception);
   }
 
   /// Execute function based on result type
@@ -42,10 +39,7 @@ sealed class Result<T> {
     if (this is Success<T>) {
       return success((this as Success<T>).data);
     }
-    return failure(
-      (this as Failure<T>).error,
-      (this as Failure<T>).exception,
-    );
+    return failure((this as Failure<T>).error, (this as Failure<T>).exception);
   }
 }
 
@@ -61,7 +55,9 @@ class Success<T> extends Result<T> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Success<T> && runtimeType == other.runtimeType && data == other.data;
+      other is Success<T> &&
+          runtimeType == other.runtimeType &&
+          data == other.data;
 
   @override
   int get hashCode => data.hashCode;

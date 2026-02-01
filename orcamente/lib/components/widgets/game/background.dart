@@ -22,10 +22,7 @@ class BackgroundWidget extends StatelessWidget {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 80,
-            color: Colors.green[600],
-          ),
+          child: Container(height: 80, color: Colors.green[600]),
         ),
       ],
     );

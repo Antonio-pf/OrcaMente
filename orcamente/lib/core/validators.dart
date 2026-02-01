@@ -173,7 +173,10 @@ class Validators {
   }
 
   /// Returns error message for description validation
-  static String? validateDescription(String description, {int maxLength = 200}) {
+  static String? validateDescription(
+    String description, {
+    int maxLength = 200,
+  }) {
     if (description.trim().isEmpty) {
       return 'Descrição é obrigatória.';
     }

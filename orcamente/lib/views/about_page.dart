@@ -212,8 +212,7 @@ class AboutPage extends StatelessWidget {
 
               Card(
                 child: Container(
-                  width:
-                      double.infinity,
+                  width: double.infinity,
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: const [

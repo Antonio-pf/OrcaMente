@@ -15,11 +15,11 @@ class PiggyBankRepository {
   PiggyBankRepository({
     FirestoreService? firestoreService,
     AuthService? authService,
-  })  : _firestoreService = firestoreService ?? FirestoreService(),
-        _authService = authService ?? AuthService();
+  }) : _firestoreService = firestoreService ?? FirestoreService(),
+       _authService = authService ?? AuthService();
 
   static const String _piggyBanksCollection = 'piggy_banks';
-  
+
   // SharedPreferences keys (for backward compatibility)
   static const String _localCurrentAmountKey = 'piggyBankCurrentAmount';
   static const String _localGoalKey = 'piggyBankGoal';
@@ -102,7 +102,7 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-      return await piggyBankResult.when(
+    return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
@@ -136,7 +136,7 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-      return await piggyBankResult.when(
+    return await piggyBankResult.when(
       success: (piggyBank) async {
         if (piggyBank.saved < amount) {
           return Failure(
@@ -177,7 +177,7 @@ class PiggyBankRepository {
 
     final piggyBankResult = await getPiggyBank();
 
-      return await piggyBankResult.when(
+    return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
@@ -204,7 +204,7 @@ class PiggyBankRepository {
   Future<Result<PiggyBankModel>> resetPiggyBank() async {
     final piggyBankResult = await getPiggyBank();
 
-      return await piggyBankResult.when(
+    return await piggyBankResult.when(
       success: (piggyBank) async {
         final updatedPiggyBank = PiggyBankModel(
           id: piggyBank.id,
@@ -236,28 +236,25 @@ class PiggyBankRepository {
     }
 
     return _firestoreService
-        .streamDocument(
-          collection: _piggyBanksCollection,
-          docId: uid,
-        )
+        .streamDocument(collection: _piggyBanksCollection, docId: uid)
         .map((doc) {
-      if (doc == null || !doc.exists) {
-        return null;
-      }
+          if (doc == null || !doc.exists) {
+            return null;
+          }
 
-      try {
-        return PiggyBankModel.fromMap(doc.data() as Map<String, dynamic>);
-      } catch (e) {
-        return null;
-      }
-    });
+          try {
+            return PiggyBankModel.fromMap(doc.data() as Map<String, dynamic>);
+          } catch (e) {
+            return null;
+          }
+        });
   }
 
   /// Migrate data from SharedPreferences to Firestore
   /// Returns Result<PiggyBankModel> with migrated data or creates new piggy bank
   Future<Result<PiggyBankModel>> _migrateFromLocalStorage() async {
     final uid = _currentUserId;
-    
+
     if (uid == null) {
       return Failure(
         'Usuário não autenticado',

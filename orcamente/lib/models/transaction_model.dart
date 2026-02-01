@@ -62,9 +62,10 @@ class TransactionModel {
         amount: (data['amount'] as num?)?.toDouble() ?? 0.0,
         type: TransactionType.fromJson(data['type'] as String? ?? 'expense'),
         category: data['category'] as String? ?? '',
-        date: data['date'] is String
-            ? DateTime.parse(data['date'] as String)
-            : (data['date'] as DateTime),
+        date:
+            data['date'] is String
+                ? DateTime.parse(data['date'] as String)
+                : (data['date'] as DateTime),
         description: data['description'] as String?,
         userId: data['userId'] as String?,
       );
@@ -119,7 +120,8 @@ class TransactionModel {
 
     if (description != null && description!.length > maxDescriptionLength) {
       errors.add(
-          'Descrição deve ter no máximo $maxDescriptionLength caracteres');
+        'Descrição deve ter no máximo $maxDescriptionLength caracteres',
+      );
     }
 
     if (date.isAfter(DateTime.now().add(const Duration(days: 1)))) {

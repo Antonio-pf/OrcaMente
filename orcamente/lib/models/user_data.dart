@@ -27,7 +27,7 @@ class UserData {
   /// Create UserData from Firestore DocumentSnapshot
   factory UserData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
-    
+
     if (data == null) {
       throw Exception('Document data is null');
     }
@@ -91,30 +91,30 @@ class UserData {
 
   /// Validate user data
   bool isValid() {
-    return name.isNotEmpty && 
-           email.isNotEmpty && 
-           _isValidEmail(email) &&
-           (phone == null || phone!.isEmpty || _isValidPhone(phone!));
+    return name.isNotEmpty &&
+        email.isNotEmpty &&
+        _isValidEmail(email) &&
+        (phone == null || phone!.isEmpty || _isValidPhone(phone!));
   }
 
   /// Get validation errors
   List<String> getValidationErrors() {
     final errors = <String>[];
-    
+
     if (name.isEmpty) {
       errors.add('Nome é obrigatório');
     }
-    
+
     if (email.isEmpty) {
       errors.add('E-mail é obrigatório');
     } else if (!_isValidEmail(email)) {
       errors.add('E-mail inválido');
     }
-    
+
     if (phone != null && phone!.isNotEmpty && !_isValidPhone(phone!)) {
       errors.add('Telefone inválido');
     }
-    
+
     return errors;
   }
 
@@ -162,21 +162,21 @@ class UserData {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is UserData &&
-      other.id == id &&
-      other.name == name &&
-      other.email == email &&
-      other.phone == phone &&
-      other.profileImageUrl == profileImageUrl;
+        other.id == id &&
+        other.name == name &&
+        other.email == email &&
+        other.phone == phone &&
+        other.profileImageUrl == profileImageUrl;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      email.hashCode ^
-      phone.hashCode ^
-      profileImageUrl.hashCode;
+        name.hashCode ^
+        email.hashCode ^
+        phone.hashCode ^
+        profileImageUrl.hashCode;
   }
 }

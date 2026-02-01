@@ -22,17 +22,16 @@ class CustomCourseCard extends StatelessWidget {
       child: Card(
         color: isDark ? CustomTheme.neutralDarkGray : Colors.white,
         elevation: 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: isDark
-                    ? CustomTheme.primaryColor.withOpacity(0.2)
-                    : CustomTheme.primaryVeryLight,
+                backgroundColor:
+                    isDark
+                        ? CustomTheme.primaryColor.withOpacity(0.2)
+                        : CustomTheme.primaryVeryLight,
                 child: Icon(
                   icon,
                   color: isDark ? Colors.white : CustomTheme.primaryDark,
@@ -45,9 +44,7 @@ class CustomCourseCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? Colors.white
-                        : CustomTheme.neutralBlack,
+                    color: isDark ? Colors.white : CustomTheme.neutralBlack,
                   ),
                 ),
               ),

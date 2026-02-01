@@ -39,7 +39,7 @@ class GameStatsBar extends StatelessWidget {
             value: "R\$ $money",
             valueColor: money < 300 ? Colors.red : Colors.green[700]!,
           ),
-          
+
           // Felicidade
           _buildStatItem(
             icon: Icons.sentiment_satisfied_alt,
@@ -48,7 +48,7 @@ class GameStatsBar extends StatelessWidget {
             value: "$happiness%",
             valueColor: happiness < 30 ? Colors.red : Colors.amber[700]!,
           ),
-          
+
           // Conhecimento
           _buildStatItem(
             icon: Icons.school,

@@ -7,13 +7,13 @@ import 'package:orcamente/core/validators.dart';
 class ForgotPasswordController extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final AuthService _authService;
-  
+
   String errorMessage = '';
   String successMessage = '';
   bool isLoading = false;
 
   ForgotPasswordController({AuthService? authService})
-      : _authService = authService ?? AuthService();
+    : _authService = authService ?? AuthService();
 
   /// Validates email using centralized validator
   bool validateEmail() {
@@ -60,6 +60,14 @@ class ForgotPasswordController extends ChangeNotifier {
         notifyListeners();
       },
     );
+  }
+
+  /// Clears the error message
+  void clearErrorMessage() {
+    if (errorMessage.isNotEmpty) {
+      errorMessage = '';
+      notifyListeners();
+    }
   }
 
   void clearMessages() {

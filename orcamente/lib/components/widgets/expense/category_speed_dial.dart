@@ -5,10 +5,7 @@ import 'package:orcamente/styles/custom_theme.dart';
 class CategorySpeedDial extends StatelessWidget {
   final Function(String) onSelectCategory;
 
-  const CategorySpeedDial({
-    super.key,
-    required this.onSelectCategory,
-  });
+  const CategorySpeedDial({super.key, required this.onSelectCategory});
 
   @override
   Widget build(BuildContext context) {

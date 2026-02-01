@@ -46,9 +46,10 @@ class Expense {
         id: id,
         description: data['description'] as String? ?? '',
         value: (data['value'] as num?)?.toDouble() ?? 0.0,
-        date: data['date'] is String
-            ? DateTime.parse(data['date'] as String)
-            : (data['date'] as DateTime),
+        date:
+            data['date'] is String
+                ? DateTime.parse(data['date'] as String)
+                : (data['date'] as DateTime),
         category: data['category'] as String? ?? categoryOutros,
         userId: data['userId'] as String?,
       );
@@ -84,7 +85,9 @@ class Expense {
     if (description.isEmpty) {
       errors.add('Descrição é obrigatória');
     } else if (description.length > maxDescriptionLength) {
-      errors.add('Descrição deve ter no máximo $maxDescriptionLength caracteres');
+      errors.add(
+        'Descrição deve ter no máximo $maxDescriptionLength caracteres',
+      );
     }
 
     if (value < minValue) {

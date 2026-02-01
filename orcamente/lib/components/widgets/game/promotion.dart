@@ -23,7 +23,9 @@ class PromotionWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.green[700],
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(8),
+              ),
             ),
             child: Text(
               text,
@@ -34,13 +36,15 @@ class PromotionWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Valor da promoção
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: Colors.green[100],
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(8),
+              ),
             ),
             child: Text(
               "+R\$$value",
@@ -51,9 +55,9 @@ class PromotionWidget extends StatelessWidget {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 5),
-          
+
           // Item visual
           Stack(
             alignment: Alignment.center,
@@ -73,11 +77,7 @@ class PromotionWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.lightbulb,
-                color: Colors.yellow,
-                size: 24,
-              ),
+              Icon(Icons.lightbulb, color: Colors.yellow, size: 24),
             ],
           ),
         ],

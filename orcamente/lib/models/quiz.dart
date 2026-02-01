@@ -23,11 +23,13 @@ class QuizQuestion {
       return QuizQuestion(
         id: data['id'] as String? ?? '',
         question: data['question'] as String? ?? '',
-        options: (data['options'] as List<dynamic>?)
+        options:
+            (data['options'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .toList() ??
             [],
-        scores: (data['scores'] as List<dynamic>?)
+        scores:
+            (data['scores'] as List<dynamic>?)
                 ?.map((e) => (e as num).toInt())
                 .toList() ??
             [],
@@ -127,10 +129,7 @@ class QuizQuestion {
 
   @override
   int get hashCode {
-    return id.hashCode ^
-        question.hashCode ^
-        options.hashCode ^
-        scores.hashCode;
+    return id.hashCode ^ question.hashCode ^ options.hashCode ^ scores.hashCode;
   }
 
   bool _listEquals<T>(List<T>? a, List<T>? b) {
@@ -162,9 +161,10 @@ class QuizAnswer {
       questionId: data['questionId'] as String? ?? '',
       selectedOption: (data['selectedOption'] as num?)?.toInt() ?? 0,
       score: (data['score'] as num?)?.toInt() ?? 0,
-      answeredAt: data['answeredAt'] is String
-          ? DateTime.parse(data['answeredAt'] as String)
-          : (data['answeredAt'] as DateTime? ?? DateTime.now()),
+      answeredAt:
+          data['answeredAt'] is String
+              ? DateTime.parse(data['answeredAt'] as String)
+              : (data['answeredAt'] as DateTime? ?? DateTime.now()),
     );
   }
 

@@ -15,10 +15,7 @@ class SettingsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Configurações',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
+          Text('Configurações', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

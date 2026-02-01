@@ -7,7 +7,6 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class PiggyBankPage extends StatefulWidget {
   const PiggyBankPage({super.key});
 
@@ -99,7 +98,6 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +119,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
   Widget _buildPiggyBankCard() {
     final progress = piggyBankAmount / _goalAmount;
     final cappedProgress = progress > 1 ? 1.0 : progress;
-    
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -139,7 +137,11 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.savings, color: Colors.green, size: 20),
+                  child: const Icon(
+                    Icons.savings,
+                    color: Colors.green,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 const Expanded(
@@ -151,7 +153,10 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 ),
                 if (piggyBankAmount >= _goalAmount)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -159,11 +164,19 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.check_circle, color: Colors.green, size: 12),
+                        const Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 12,
+                        ),
                         const SizedBox(width: 4),
                         const Text(
                           "Meta atingida!",
-                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500, fontSize: 10),
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ),
@@ -171,7 +184,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
               ],
             ),
             const SizedBox(height: 20),
-            
+
             // Progress and amount info - Responsive layout
             LayoutBuilder(
               builder: (context, constraints) {
@@ -198,11 +211,11 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 }
               },
             ),
-            
+
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 16),
-            
+
             // Input field with improved styling
             TextField(
               controller: _amountController,
@@ -230,11 +243,14 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 ),
                 filled: true,
                 fillColor: Colors.grey.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Button with improved styling
             ElevatedButton.icon(
               onPressed: _addAmountToPiggyBank,
@@ -260,7 +276,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
       ),
     );
   }
-  
+
   Widget _buildCircularProgress(double progress) {
     return CircularPercentIndicator(
       radius: 50.0,
@@ -286,7 +302,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
       animationDuration: 1000,
     );
   }
-  
+
   Widget _buildAmountInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,10 +326,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
           spacing: 4,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            const Text(
-              "Meta:",
-              style: TextStyle(color: Colors.grey),
-            ),
+            const Text("Meta:", style: TextStyle(color: Colors.grey)),
             Text(
               "R\$ ${_goalAmount.toStringAsFixed(2)}",
               style: const TextStyle(fontWeight: FontWeight.w500),
@@ -325,63 +338,66 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     TextEditingController(text: _goalAmount.toString());
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Alterar Meta'),
-                    content: TextField(
-                      controller: _goalController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        MoneyInputFormatter(
-                          leadingSymbol: 'R\$',
-                          useSymbolPadding: true,
-                        ),
-                      ],
-                      decoration: const InputDecoration(
-                        hintText: "Digite nova meta",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancelar'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          final newGoal = double.tryParse(
-                            toNumericString(
-                              _goalController.text,
-                              allowPeriod: true,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text('Alterar Meta'),
+                        content: TextField(
+                          controller: _goalController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            MoneyInputFormatter(
+                              leadingSymbol: 'R\$',
+                              useSymbolPadding: true,
                             ),
-                          );
-
-                          if (newGoal != null && newGoal > 0) {
-                            setState(() {
-                              _goalAmount = newGoal;
-                            });
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('Meta alterada com sucesso!'),
-                                backgroundColor: Colors.green,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                margin: const EdgeInsets.all(10),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                          ],
+                          decoration: const InputDecoration(
+                            hintText: "Digite nova meta",
+                            border: OutlineInputBorder(),
+                          ),
                         ),
-                        child: const Text('Salvar'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancelar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              final newGoal = double.tryParse(
+                                toNumericString(
+                                  _goalController.text,
+                                  allowPeriod: true,
+                                ),
+                              );
+
+                              if (newGoal != null && newGoal > 0) {
+                                setState(() {
+                                  _goalAmount = newGoal;
+                                });
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      'Meta alterada com sucesso!',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    margin: const EdgeInsets.all(10),
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Salvar'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
                 );
               },
               child: Container(
@@ -419,7 +435,11 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.trending_up, color: Colors.blue, size: 20),
+                  child: const Icon(
+                    Icons.trending_up,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -434,7 +454,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Stats cards with improved styling - Responsive layout
             LayoutBuilder(
               builder: (context, constraints) {
@@ -496,7 +516,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
               },
             ),
             const SizedBox(height: 16),
-            
+
             // Motivation card
             Container(
               decoration: BoxDecoration(
@@ -531,10 +551,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: borderColor,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -547,19 +564,15 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 16,
-                ),
+                child: Icon(icon, color: iconColor, size: 16),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -571,9 +584,9 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -601,27 +614,35 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     color: Colors.amber.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+                  child: const Icon(
+                    Icons.emoji_events,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     "Suas conquistas",
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Achievements with improved styling - Responsive layout
             LayoutBuilder(
               builder: (context, constraints) {
                 // Calculate how many achievements can fit per row
-                final double itemWidth = 70; // Approximate width needed for each achievement
-                final int itemsPerRow = (constraints.maxWidth / itemWidth).floor();
-                
+                final double itemWidth =
+                    70; // Approximate width needed for each achievement
+                final int itemsPerRow =
+                    (constraints.maxWidth / itemWidth).floor();
+
                 // Create rows of achievements
                 return Wrap(
                   spacing: 8,
@@ -688,9 +709,10 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: unlocked
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.grey.withOpacity(0.1),
+                  color:
+                      unlocked
+                          ? Colors.green.withOpacity(0.1)
+                          : Colors.grey.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -700,21 +722,18 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 decoration: BoxDecoration(
                   color: unlocked ? Colors.green : Colors.grey.withOpacity(0.3),
                   shape: BoxShape.circle,
-                  boxShadow: unlocked
-                      ? [
-                          BoxShadow(
-                            color: Colors.green.withOpacity(0.3),
-                            blurRadius: 8,
-                            spreadRadius: 2,
-                          )
-                        ]
-                      : null,
+                  boxShadow:
+                      unlocked
+                          ? [
+                            BoxShadow(
+                              color: Colors.green.withOpacity(0.3),
+                              blurRadius: 8,
+                              spreadRadius: 2,
+                            ),
+                          ]
+                          : null,
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
               if (unlocked)
                 Positioned(

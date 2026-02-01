@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class GameTutorial extends StatelessWidget {
   final VoidCallback onDismiss;
 
-  const GameTutorial({
-    super.key,
-    required this.onDismiss,
-  });
+  const GameTutorial({super.key, required this.onDismiss});
 
   @override
   Widget build(BuildContext context) {
@@ -34,55 +31,56 @@ class GameTutorial extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               _buildTutorialItem(
                 icon: Icons.touch_app,
                 title: "Toque na tela para pular",
-                description: "Toque duas vezes rapidamente para pular mais alto",
+                description:
+                    "Toque duas vezes rapidamente para pular mais alto",
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildTutorialItem(
                 icon: Icons.lightbulb,
                 title: "Colete dicas financeiras",
                 description: "Elas aumentam seu dinheiro e conhecimento",
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildTutorialItem(
                 icon: Icons.money_off,
                 title: "Evite as dívidas",
                 description: "Elas reduzem seu dinheiro e felicidade",
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildTutorialItem(
                 icon: Icons.speed,
                 title: "O jogo acelera com o tempo",
                 description: "Quanto mais pontos, maior a dificuldade",
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               ElevatedButton(
                 onPressed: onDismiss,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
                 child: const Text(
                   "COMEÇAR",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -121,10 +119,7 @@ class GameTutorial extends StatelessWidget {
               ),
               Text(
                 description,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14),
               ),
             ],
           ),

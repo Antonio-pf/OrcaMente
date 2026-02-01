@@ -4,11 +4,7 @@ class Obstacle extends StatelessWidget {
   final String tipoDivida;
   final int valor;
 
-  const Obstacle({
-    super.key,
-    required this.tipoDivida,
-    required this.valor,
-  });
+  const Obstacle({super.key, required this.tipoDivida, required this.valor});
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +26,15 @@ class Obstacle extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Valor da dívida
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
             color: Colors.red[100],
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(8),
+            ),
           ),
           child: Text(
             "R\$$valor",
@@ -47,9 +45,9 @@ class Obstacle extends StatelessWidget {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 5),
-        
+
         // Obstáculo visual
         Stack(
           alignment: Alignment.center,
@@ -69,11 +67,7 @@ class Obstacle extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.money_off,
-              color: Colors.white,
-              size: 24,
-            ),
+            Icon(Icons.money_off, color: Colors.white, size: 24),
           ],
         ),
       ],

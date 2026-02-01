@@ -106,7 +106,7 @@ class QuizController extends ChangeNotifier {
         // Mark quiz as answered in SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('quizAnswered', true);
-        
+
         _isLoading = false;
         notifyListeners();
       },

@@ -92,19 +92,22 @@ class PiggyBankModel {
         name: map['name'] as String,
         goal: (map['goal'] as num).toDouble(),
         saved: (map['saved'] as num).toDouble(),
-        createdAt: map['createdAt'] is String
-            ? DateTime.parse(map['createdAt'] as String)
-            : (map['createdAt'] as DateTime),
-        updatedAt: map['updatedAt'] != null
-            ? (map['updatedAt'] is String
-                ? DateTime.parse(map['updatedAt'] as String)
-                : (map['updatedAt'] as DateTime))
-            : null,
-        goalDate: map['goalDate'] != null
-            ? (map['goalDate'] is String
-                ? DateTime.parse(map['goalDate'] as String)
-                : (map['goalDate'] as DateTime))
-            : null,
+        createdAt:
+            map['createdAt'] is String
+                ? DateTime.parse(map['createdAt'] as String)
+                : (map['createdAt'] as DateTime),
+        updatedAt:
+            map['updatedAt'] != null
+                ? (map['updatedAt'] is String
+                    ? DateTime.parse(map['updatedAt'] as String)
+                    : (map['updatedAt'] as DateTime))
+                : null,
+        goalDate:
+            map['goalDate'] != null
+                ? (map['goalDate'] is String
+                    ? DateTime.parse(map['goalDate'] as String)
+                    : (map['goalDate'] as DateTime))
+                : null,
         description: map['description'] as String?,
       );
     } catch (e) {
@@ -115,7 +118,7 @@ class PiggyBankModel {
   /// Create from Firestore DocumentSnapshot
   factory PiggyBankModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>?;
-    
+
     if (data == null) {
       throw Exception('Document data is null');
     }
@@ -172,7 +175,9 @@ class PiggyBankModel {
     }
 
     if (description != null && description!.length > maxDescriptionLength) {
-      errors.add('Descrição deve ter no máximo $maxDescriptionLength caracteres');
+      errors.add(
+        'Descrição deve ter no máximo $maxDescriptionLength caracteres',
+      );
     }
 
     if (goalDate != null && goalDate!.isBefore(createdAt)) {
@@ -210,10 +215,7 @@ class PiggyBankModel {
     if (amount <= 0) {
       throw ArgumentError('Amount must be positive');
     }
-    return copyWith(
-      saved: saved + amount,
-      updatedAt: DateTime.now(),
-    );
+    return copyWith(saved: saved + amount, updatedAt: DateTime.now());
   }
 
   /// Withdraw amount from saved
@@ -224,10 +226,7 @@ class PiggyBankModel {
     if (amount > saved) {
       throw ArgumentError('Insufficient funds');
     }
-    return copyWith(
-      saved: saved - amount,
-      updatedAt: DateTime.now(),
-    );
+    return copyWith(saved: saved - amount, updatedAt: DateTime.now());
   }
 
   @override

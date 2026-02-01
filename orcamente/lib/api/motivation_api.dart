@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 
 class MotivationApi {
-  static final _url = Uri.parse('https://moraislucas.github.io/MeMotive/phrases.json');
+  static final _url = Uri.parse(
+    'https://moraislucas.github.io/MeMotive/phrases.json',
+  );
 
   static Future<String> fetchMotivationalPhrase() async {
     try {

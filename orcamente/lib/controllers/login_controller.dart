@@ -11,7 +11,7 @@ class LoginController extends ChangeNotifier {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final AuthService _authService;
-  
+
   String errorMessage = '';
   bool isLoading = false;
 

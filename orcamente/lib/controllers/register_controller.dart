@@ -17,7 +17,7 @@ class RegisterController extends ChangeNotifier {
   bool isLoading = false;
 
   RegisterController({AuthService? authService})
-      : _authService = authService ?? AuthService();
+    : _authService = authService ?? AuthService();
 
   void _setLoading(bool value) {
     isLoading = value;
@@ -27,6 +27,14 @@ class RegisterController extends ChangeNotifier {
   void _setError(String message) {
     errorMessage = message;
     notifyListeners();
+  }
+
+  /// Clears the error message
+  void clearErrorMessage() {
+    if (errorMessage.isNotEmpty) {
+      errorMessage = '';
+      notifyListeners();
+    }
   }
 
   /// Validates all registration fields using centralized validators
@@ -66,7 +74,10 @@ class RegisterController extends ChangeNotifier {
     }
 
     // Validate password confirmation
-    final confirmError = Validators.validatePasswordConfirmation(password, confirmPassword);
+    final confirmError = Validators.validatePasswordConfirmation(
+      password,
+      confirmPassword,
+    );
     if (confirmError != null) {
       _setError(confirmError);
       return false;

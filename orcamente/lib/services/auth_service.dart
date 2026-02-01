@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:orcamente/core/result.dart';
 import 'package:orcamente/core/exceptions.dart';
+import 'package:orcamente/core/constants.dart';
+import 'package:orcamente/core/messages.dart';
 
 /// Service for Firebase Authentication operations
 /// Returns Result<T> for type-safe error handling
@@ -21,8 +23,6 @@ class AuthService {
     return _auth.currentUser != null;
   }
 
-  /// Realiza login com email e senha
-  /// Returns Result<User> with user data on success or error on failure
   Future<Result<User>> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -34,7 +34,7 @@ class AuthService {
       );
 
       if (credential.user == null) {
-        return const Failure('Falha ao fazer login. Usuário não encontrado.');
+        return const Failure(AppMessages.authUserNotFound);
       }
 
       return Success(credential.user!);
@@ -42,13 +42,13 @@ class AuthService {
       final exception = _mapAuthException(e);
       return Failure(exception.message, exception);
     } catch (e) {
-      return Failure('Erro inesperado ao fazer login: $e', Exception(e.toString()));
+      return Failure(
+        'Erro inesperado ao fazer login: $e',
+        Exception(e.toString()),
+      );
     }
   }
 
-  /// Cria nova conta com email e senha
-  /// Also saves additional user data to Firestore
-  /// Returns Result<User> with user data on success
   Future<Result<User>> createUserWithEmailAndPassword({
     required String email,
     required String password,
@@ -62,23 +62,29 @@ class AuthService {
       );
 
       if (credential.user == null) {
-        return const Failure('Falha ao criar conta. Tente novamente.');
+        return const Failure(AppMessages.authUnknownError);
       }
 
       // Salvar dados adicionais no Firestore
-      await _firestore.collection('users').doc(credential.user!.uid).set({
-        'nome': name,
-        'email': email,
-        'telefone': phone,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(credential.user!.uid)
+          .set({
+            AppConstants.fieldUserName: name,
+            AppConstants.fieldUserEmail: email,
+            AppConstants.fieldUserPhone: phone,
+            AppConstants.fieldCreatedAt: FieldValue.serverTimestamp(),
+          });
 
       return Success(credential.user!);
     } on FirebaseAuthException catch (e) {
       final exception = _mapAuthException(e);
       return Failure(exception.message, exception);
     } catch (e) {
-      return Failure('Erro ao criar conta: $e', Exception(e.toString()));
+      return Failure(
+        '${AppMessages.authUnknownError}: $e',
+        Exception(e.toString()),
+      );
     }
   }
 
@@ -92,7 +98,10 @@ class AuthService {
       final exception = _mapAuthException(e);
       return Failure(exception.message, exception);
     } catch (e) {
-      return Failure('Erro ao enviar email de recuperação: $e', Exception(e.toString()));
+      return Failure(
+        '${AppMessages.authUnknownError}: $e',
+        Exception(e.toString()),
+      );
     }
   }
 
@@ -103,7 +112,10 @@ class AuthService {
       await _auth.signOut();
       return const Success(null);
     } catch (e) {
-      return Failure('Erro ao fazer logout: $e', Exception(e.toString()));
+      return Failure(
+        '${AppMessages.authUnknownError}: $e',
+        Exception(e.toString()),
+      );
     }
   }
 
@@ -111,27 +123,40 @@ class AuthService {
   /// Returns Result<Map<String, dynamic>> with user data
   Future<Result<Map<String, dynamic>>> getUserData() async {
     if (!isAuthenticated()) {
-      return const Failure('Usuário não autenticado', AuthException('Usuário não autenticado'));
+      return Failure(
+        AppMessages.authUnknownError,
+        AuthException(AppMessages.authUnknownError),
+      );
     }
 
     try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .get();
+      final doc =
+          await _firestore
+              .collection(AppConstants.usersCollection)
+              .doc(_auth.currentUser!.uid)
+              .get();
 
       if (!doc.exists) {
-        return const Failure('Dados do usuário não encontrados', DataException('Dados não encontrados'));
+        return Failure(
+          AppMessages.userLoadError,
+          DataException(AppMessages.firestoreNotFound),
+        );
       }
 
       final data = doc.data();
       if (data == null) {
-        return const Failure('Dados do usuário vazios', DataException('Dados vazios'));
+        return Failure(
+          AppMessages.userLoadError,
+          DataException(AppMessages.firestoreNotFound),
+        );
       }
 
       return Success(data);
     } catch (e) {
-      return Failure('Erro ao buscar dados do usuário: $e', DataException('Erro ao buscar dados'));
+      return Failure(
+        '${AppMessages.userLoadError}: $e',
+        DataException(AppMessages.userLoadError),
+      );
     }
   }
 
@@ -157,12 +182,12 @@ class AuthService {
         return AuthException.tooManyRequests();
       case 'network-request-failed':
         return const AuthException(
-          'Erro de conexão. Verifique sua internet.',
-          code: 'network-request-failed',
+          AppMessages.networkNoConnection,
+          code: AppConstants.errorCodeNetworkRequestFailed,
         );
       default:
         return AuthException(
-          'Erro de autenticação: ${e.message ?? 'Erro desconhecido'}',
+          AppMessages.getAuthErrorMessage(e.code),
           code: e.code,
           originalError: e,
         );

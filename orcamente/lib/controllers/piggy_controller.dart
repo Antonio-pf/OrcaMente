@@ -78,10 +78,7 @@ class PiggyBankController extends ChangeNotifier {
     notifyListeners();
 
     final oldPiggyBank = piggyBank;
-    piggyBank = piggyBank.copyWith(
-      saved: 0,
-      updatedAt: DateTime.now(),
-    );
+    piggyBank = piggyBank.copyWith(saved: 0, updatedAt: DateTime.now());
     notifyListeners();
 
     final result = await _repository.updatePiggyBank(piggyBank);
@@ -114,10 +111,7 @@ class PiggyBankController extends ChangeNotifier {
     notifyListeners();
 
     final oldPiggyBank = piggyBank;
-    piggyBank = piggyBank.copyWith(
-      goal: newGoal,
-      updatedAt: DateTime.now(),
-    );
+    piggyBank = piggyBank.copyWith(goal: newGoal, updatedAt: DateTime.now());
     notifyListeners();
 
     final result = await _repository.updatePiggyBank(piggyBank);
@@ -150,10 +144,7 @@ class PiggyBankController extends ChangeNotifier {
     notifyListeners();
 
     final oldPiggyBank = piggyBank;
-    piggyBank = piggyBank.copyWith(
-      name: newName,
-      updatedAt: DateTime.now(),
-    );
+    piggyBank = piggyBank.copyWith(name: newName, updatedAt: DateTime.now());
     notifyListeners();
 
     final result = await _repository.updatePiggyBank(piggyBank);
@@ -203,7 +194,8 @@ class PiggyBankController extends ChangeNotifier {
   bool get isGoalReached => piggyBank.saved >= piggyBank.goal;
 
   /// Get remaining amount to reach goal
-  double get remainingToGoal => (piggyBank.goal - piggyBank.saved).clamp(0, double.infinity);
+  double get remainingToGoal =>
+      (piggyBank.goal - piggyBank.saved).clamp(0, double.infinity);
 
   /// Get progress percentage (0-100)
   double get progressPercentage => (progress * 100).clamp(0, 100);

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:orcamente/core/result.dart';
 import 'package:orcamente/core/exceptions.dart';
+import 'package:orcamente/core/constants.dart';
+import 'package:orcamente/core/messages.dart';
 
 /// Generic Firestore service for CRUD operations
 /// Returns Result<T> for type-safe error handling
@@ -17,22 +19,16 @@ class FirestoreService {
       final doc = await _firestore.collection(collection).doc(docId).get();
 
       if (!doc.exists) {
-        return Failure(
-          'Documento não encontrado',
-          DataException.notFound(),
-        );
+        return Failure(AppMessages.firestoreNotFound, DataException.notFound());
       }
 
       return Success(doc);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao buscar documento: $e',
-        DataException('Erro ao buscar documento'),
+        '${AppMessages.firestoreUnknownError}: $e',
+        DataException(AppMessages.firestoreUnknownError),
       );
     }
   }
@@ -50,7 +46,7 @@ class FirestoreService {
         final data = doc.data() as Map<String, dynamic>?;
         if (data == null) {
           return Failure(
-            'Documento vazio',
+            AppMessages.firestoreNotFound,
             DataException.invalidFormat(),
           );
         }
@@ -69,20 +65,17 @@ class FirestoreService {
     bool merge = false,
   }) async {
     try {
-      await _firestore.collection(collection).doc(docId).set(
-            data,
-            SetOptions(merge: merge),
-          );
+      await _firestore
+          .collection(collection)
+          .doc(docId)
+          .set(data, SetOptions(merge: merge));
 
       return const Success(null);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao salvar documento: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.saveFailed(),
       );
     }
@@ -100,13 +93,10 @@ class FirestoreService {
 
       return const Success(null);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao atualizar documento: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.saveFailed(),
       );
     }
@@ -123,13 +113,10 @@ class FirestoreService {
 
       return const Success(null);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao deletar documento: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.deleteFailed(),
       );
     }
@@ -146,13 +133,10 @@ class FirestoreService {
 
       return Success(docRef.id);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao adicionar documento: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.saveFailed(),
       );
     }
@@ -172,13 +156,10 @@ class FirestoreService {
 
       return Success(querySnapshot.docs);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao buscar coleção: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.loadFailed(),
       );
     }
@@ -235,13 +216,10 @@ class FirestoreService {
 
       return Success(docRef.id);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao adicionar à subcoleção: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.saveFailed(),
       );
     }
@@ -267,13 +245,10 @@ class FirestoreService {
 
       return Success(querySnapshot.docs);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao buscar subcoleção: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.loadFailed(),
       );
     }
@@ -318,13 +293,10 @@ class FirestoreService {
 
       return const Success(null);
     } on FirebaseException catch (e) {
-      return Failure(
-        _mapFirestoreError(e),
-        _mapFirestoreException(e),
-      );
+      return Failure(_mapFirestoreError(e), _mapFirestoreException(e));
     } catch (e) {
       return Failure(
-        'Erro ao deletar da subcoleção: $e',
+        '${AppMessages.firestoreUnknownError}: $e',
         DataException.deleteFailed(),
       );
     }
@@ -332,24 +304,8 @@ class FirestoreService {
 
   /// Maps FirebaseException to user-friendly error message
   String _mapFirestoreError(FirebaseException e) {
-    switch (e.code) {
-      case 'permission-denied':
-        return 'Você não tem permissão para acessar estes dados.';
-      case 'not-found':
-        return 'Dados não encontrados.';
-      case 'already-exists':
-        return 'Dados já existem.';
-      case 'resource-exhausted':
-        return 'Limite de recursos excedido. Tente novamente mais tarde.';
-      case 'unauthenticated':
-        return 'Você precisa estar autenticado para realizar esta ação.';
-      case 'unavailable':
-        return 'Serviço temporariamente indisponível. Tente novamente.';
-      case 'deadline-exceeded':
-        return 'Operação expirou. Tente novamente.';
-      default:
-        return 'Erro ao acessar dados [${e.code}]: ${e.message ?? 'Erro desconhecido'}';
-    }
+    // Use centralized message mapping
+    return AppMessages.getFirestoreErrorMessage(e.code);
   }
 
   /// Maps FirebaseException to DataException
