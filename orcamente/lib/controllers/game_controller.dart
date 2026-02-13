@@ -20,6 +20,8 @@ class GameController {
   final ValueNotifier<List<Map<String, dynamic>>> promotions = ValueNotifier(
     [],
   );
+  final ValueNotifier<bool> gameStarted = ValueNotifier(false);
+  final ValueNotifier<int> currentScenario = ValueNotifier(0);
 
   double? _screenWidth;
   double? _screenHeight;
@@ -102,7 +104,14 @@ class GameController {
       generatePromotion(screenWidth + 450),
     ];
 
-    startGameLoop();
+    // Não inicia o jogo automaticamente
+  }
+
+  void startGame() {
+    if (!gameStarted.value) {
+      gameStarted.value = true;
+      startGameLoop();
+    }
   }
 
   void startGameLoop() {
@@ -186,15 +195,18 @@ class GameController {
     if (_screenWidth == null || _screenHeight == null) return;
 
     double playerX = _screenWidth! * 0.15;
-    const double playerWidth = 40;
+    const double playerWidth = 50;
     const double playerHeightPct = 0.15;
     double playerTopPx = playerY.value * _screenHeight!;
     double playerHeightPx = playerHeightPct * _screenHeight!;
+    
+    // Caixa de colisão mais precisa (reduzida em 20% para melhor jogabilidade)
+    double collisionMargin = 10;
     Rect playerRect = Rect.fromLTWH(
-      playerX,
-      playerTopPx,
-      playerWidth,
-      playerHeightPx,
+      playerX + collisionMargin,
+      playerTopPx + collisionMargin,
+      playerWidth - (collisionMargin * 2),
+      playerHeightPx - (collisionMargin * 2),
     );
 
     // Verificar colisões com obstáculos
@@ -226,17 +238,19 @@ class GameController {
         obstacle["collided"] = false;
       }
 
-      // Verificar colisão
+      // Verificar colisão com margem de erro reduzida
       double obstacleX = obstacle["x"];
       const double obstacleWidth = 40;
       const double obstacleHeightPct = 0.08;
       double obstacleTopPx = 0.82 * _screenHeight!;
       double obstacleHeightPx = obstacleHeightPct * _screenHeight!;
+      
+      // Caixa de colisão mais precisa para obstáculos
       Rect obstacleRect = Rect.fromLTWH(
-        obstacleX,
-        obstacleTopPx,
-        obstacleWidth,
-        obstacleHeightPx,
+        obstacleX + 5,
+        obstacleTopPx + 5,
+        obstacleWidth - 10,
+        obstacleHeightPx - 10,
       );
 
       if (playerRect.overlaps(obstacleRect) && !obstacle["collided"]) {
@@ -281,17 +295,19 @@ class GameController {
         promo["collected"] = false;
       }
 
-      // Verificar colisão
+      // Verificar colisão com margem de erro reduzida
       const double promoWidth = 40;
       const double promoHeightPct = 0.08;
       double promoY = promo["y"];
       double promoTopPx = promoY * _screenHeight!;
       double promoHeightPx = promoHeightPct * _screenHeight!;
+      
+      // Caixa de colisão mais precisa para promoções
       Rect promoRect = Rect.fromLTWH(
-        promo["x"],
-        promoTopPx,
-        promoWidth,
-        promoHeightPx,
+        promo["x"] + 5,
+        promoTopPx + 5,
+        promoWidth - 10,
+        promoHeightPx - 10,
       );
 
       if (playerRect.overlaps(promoRect)) {
@@ -454,6 +470,11 @@ class GameController {
     start(screenWidth, screenHeight);
   }
 
+  void changeScenario() {
+    currentScenario.value = (currentScenario.value + 1) % 3;
+    showFeedback("🎨 Novo cenário!", isPositive: true);
+  }
+
   void dispose() {
     gameLoop?.cancel();
     _feedbackTimer?.cancel();
@@ -470,5 +491,7 @@ class GameController {
     feedbackText.dispose();
     obstacles.dispose();
     promotions.dispose();
+    gameStarted.dispose();
+    currentScenario.dispose();
   }
 }

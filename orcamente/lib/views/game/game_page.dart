@@ -39,6 +39,13 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame>
     });
   }
 
+  void _startGame() {
+    setState(() {
+      _showTutorial = false;
+    });
+    _controller.startGame();
+  }
+
   void checkGameOver(double dinheiro) {
     if (dinheiro < 0 && !_gameOverShown) {
       _gameOverShown = true;
@@ -258,26 +265,59 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame>
                   // Texto de feedback
                   _buildFeedbackText(),
 
-                  // Botão de pausa
-                  Positioned(
-                    top: 40,
-                    right: 20,
-                    child: Material(
-                      color: Colors.white.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(30),
-                      child: InkWell(
-                        onTap: _togglePause,
-                        borderRadius: BorderRadius.circular(30),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(
-                            _isPaused ? Icons.play_arrow : Icons.pause,
-                            color: Colors.green[700],
-                            size: 30,
-                          ),
+                  // Botões de controle
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _controller.gameStarted,
+                    builder: (_, started, __) {
+                      if (!started) return const SizedBox.shrink();
+                      return Positioned(
+                        top: 40,
+                        right: 20,
+                        child: Column(
+                          children: [
+                            // Botão de pausa
+                            Material(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(30),
+                              child: InkWell(
+                                onTap: _togglePause,
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Icon(
+                                    _isPaused ? Icons.play_arrow : Icons.pause,
+                                    color: Colors.green[700],
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Botão de trocar cenário
+                            Material(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(30),
+                              child: InkWell(
+                                onTap: () {
+                                  if (!_isPaused) {
+                                    _controller.changeScenario();
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Icon(
+                                    Icons.landscape,
+                                    color: Colors.green[700],
+                                    size: 30,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
 
                   // Pontuação e combo
@@ -351,8 +391,86 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame>
               ),
             ),
 
+          // Tela inicial com botão "Começar"
+          ValueListenableBuilder<bool>(
+            valueListenable: _controller.gameStarted,
+            builder: (_, started, __) {
+              if (started) return const SizedBox.shrink();
+              
+              return Container(
+                color: Colors.black.withOpacity(0.7),
+                width: double.infinity,
+                height: double.infinity,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.videogame_asset,
+                        color: Colors.white,
+                        size: 80,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "OrcaMente Runner",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Text(
+                          "Colete dicas de educação financeira e desvie das dívidas!",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      ElevatedButton.icon(
+                        onPressed: _startGame,
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text("COMEÇAR"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          textStyle: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _showTutorial = true;
+                          });
+                        },
+                        icon: const Icon(Icons.help_outline),
+                        label: const Text("Como Jogar"),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+
           // Tutorial inicial
-          if (_showTutorial)
+          if (_showTutorial && !_controller.gameStarted.value)
             GameTutorial(
               onDismiss: () {
                 setState(() {
@@ -366,21 +484,42 @@ class _EndlessRunnerGameState extends State<EndlessRunnerGame>
   }
 
   Widget _buildParallaxBackground(double screenWidth, double screenHeight) {
-    return Stack(
-      children: [
-        // Céu com gradiente animado
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.lightBlue[300]!, Colors.lightBlue[100]!],
+    return ValueListenableBuilder<int>(
+      valueListenable: _controller.currentScenario,
+      builder: (_, scenario, __) {
+        List<Color> colors;
+        switch (scenario) {
+          case 0:
+            colors = [Colors.lightBlue[300]!, Colors.lightBlue[100]!];
+            break;
+          case 1:
+            colors = [Colors.purple[300]!, Colors.pink[100]!];
+            break;
+          case 2:
+            colors = [Colors.orange[300]!, Colors.amber[100]!];
+            break;
+          default:
+            colors = [Colors.lightBlue[300]!, Colors.lightBlue[100]!];
+        }
+
+        return Stack(
+          children: [
+            // Céu com gradiente animado
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 500),
+              width: double.infinity,
+              height: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: colors,
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
