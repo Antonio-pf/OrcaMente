@@ -28,6 +28,10 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Este app precisa acessar sua localização para gerar perguntas de quiz personalizadas para sua região.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Este app precisa acessar sua localização para fornecer conteúdo educacional personalizado.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
