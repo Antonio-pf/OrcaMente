@@ -5,11 +5,13 @@ import '../../../styles/custom_theme.dart';
 class QuizResultPage extends StatelessWidget {
   final String profile;
   final String knowledge;
+  final String? aiJustification;
 
   const QuizResultPage({
     super.key,
     required this.profile,
     required this.knowledge,
+    this.aiJustification,
   });
 
   @override
@@ -83,6 +85,49 @@ class QuizResultPage extends StatelessWidget {
             ),
 
             const SizedBox(height: 16),
+
+            // AI Analysis Card (if available)
+            if (aiJustification != null) ...[
+              Card(
+                color: colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.psychology_rounded,
+                            color: CustomTheme.primaryColor,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Análise de IA:',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: CustomTheme.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        aiJustification!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             Card(
               color: colorScheme.surface,
