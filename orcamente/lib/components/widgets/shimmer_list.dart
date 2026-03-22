@@ -17,12 +17,13 @@ class ShimmerPlaceholderList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: padding,
       child: Shimmer.fromColors(
         baseColor: Colors.grey.shade300,
         highlightColor: Colors.grey.shade100,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: List.generate(itemCount, (index) {
             return Container(
               height: itemHeight,

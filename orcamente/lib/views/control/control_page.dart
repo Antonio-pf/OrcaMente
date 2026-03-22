@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:orcamente/components/widgets/motivation_card.dart';
+import 'package:orcamente/components/common/gradient_background.dart';
+import 'package:orcamente/components/common/standard_card.dart';
+import 'package:orcamente/components/common/standard_button.dart';
 import 'package:orcamente/styles/custom_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
@@ -75,24 +78,57 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
         _amountController.clear();
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Valor guardado com sucesso!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Valor guardado com sucesso!'),
+              ],
+            ),
+            backgroundColor: CustomTheme.primaryColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(10),
           ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao salvar no Firestore: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Erro ao salvar: $e')),
+              ],
+            ),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.all(10),
           ),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Informe um valor válido!'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.white),
+              SizedBox(width: 8),
+              Text('Informe um valor válido!'),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.all(10),
         ),
       );
     }
@@ -101,16 +137,18 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildPiggyBankCard(),
-            const SizedBox(height: 16),
-            _buildProgressCard(context),
-            const SizedBox(height: 16),
-            _buildAchievementsCard(context, piggyBankAmount),
-          ],
+      body: GradientBackground(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildPiggyBankCard(),
+              const SizedBox(height: 16),
+              _buildProgressCard(context),
+              const SizedBox(height: 16),
+              _buildAchievementsCard(context, piggyBankAmount),
+            ],
+          ),
         ),
       ),
     );
@@ -120,183 +158,164 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     final progress = piggyBankAmount / _goalAmount;
     final cappedProgress = progress > 1 ? 1.0 : progress;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with title and badge
-            Row(
-              children: [
+    return StandardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header with title and badge
+          Row(
+            children: [
+              const IconBadge(
+                icon: Icons.savings,
+                iconColor: CustomTheme.primaryColor,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  "Meu Cofrinho",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1B5E20)),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (piggyBankAmount >= _goalAmount)
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: CustomTheme.primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Icon(
-                    Icons.savings,
-                    color: Colors.green,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Expanded(
-                  child: Text(
-                    "Meu Cofrinho",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (piggyBankAmount >= _goalAmount)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          "Meta atingida!",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Progress and amount info - Responsive layout
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // For very small screens, stack the progress indicator and amount info
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildCircularProgress(cappedProgress),
-                      const SizedBox(height: 16),
-                      _buildAmountInfo(),
+                      Icon(
+                        Icons.check_circle,
+                        color: CustomTheme.primaryColor,
+                        size: 14,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        "Meta atingida!",
+                        style: TextStyle(
+                          color: CustomTheme.primaryDark,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
                     ],
-                  );
-                } else {
-                  // For larger screens, place them side by side
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildCircularProgress(cappedProgress),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildAmountInfo()),
-                    ],
-                  );
-                }
-              },
-            ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 24),
 
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 16),
+          // Progress and amount info - Responsive layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // For very small screens, stack the progress indicator and amount info
+              if (constraints.maxWidth < 300) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildCircularProgress(cappedProgress),
+                    const SizedBox(height: 16),
+                    _buildAmountInfo(),
+                  ],
+                );
+              } else {
+                // For larger screens, place them side by side
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildCircularProgress(cappedProgress),
+                    const SizedBox(width: 16),
+                    Expanded(child: _buildAmountInfo()),
+                  ],
+                );
+              }
+            },
+          ),
 
-            // Input field with improved styling
-            TextField(
-              controller: _amountController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                MoneyInputFormatter(
-                  leadingSymbol: 'R\$',
-                  useSymbolPadding: true,
-                ),
-              ],
-              decoration: InputDecoration(
-                hintText: "Quanto deseja guardar?",
-                prefixIcon: const Icon(Icons.attach_money, color: Colors.green),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFFCCCCCC)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.green, width: 2),
-                ),
-                filled: true,
-                fillColor: Colors.grey.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16,
-                  horizontal: 16,
-                ),
+          const SizedBox(height: 24),
+          Divider(color: Colors.grey.withOpacity(0.2)),
+          const SizedBox(height: 20),
+
+          // Input field with improved styling
+          TextField(
+            controller: _amountController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              MoneyInputFormatter(
+                leadingSymbol: 'R\$',
+                useSymbolPadding: true,
+              ),
+            ],
+            decoration: InputDecoration(
+              hintText: "Quanto deseja guardar?",
+              hintStyle: const TextStyle(color: Color(0xFF9E9E9E)),
+              prefixIcon: const Icon(Icons.attach_money, color: CustomTheme.primaryColor),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: Colors.grey.withOpacity(0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: CustomTheme.primaryColor, width: 2.5),
+              ),
+              filled: true,
+              fillColor: CustomTheme.primaryColor.withOpacity(0.03),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 18,
+                horizontal: 16,
               ),
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 16),
 
-            // Button with improved styling
-            ElevatedButton.icon(
+          // Button with standardized styling
+          SizedBox(
+            width: double.infinity,
+            child: StandardButton(
+              text: "Guardar no Cofrinho",
+              icon: Icons.savings,
               onPressed: _addAmountToPiggyBank,
-              icon: const Icon(Icons.savings),
-              label: const Text("Guardar no Cofrinho"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildCircularProgress(double progress) {
     return CircularPercentIndicator(
-      radius: 50.0,
-      lineWidth: 10.0,
+      radius: 55.0,
+      lineWidth: 12.0,
       percent: progress,
       center: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             "${(progress * 100).toInt()}%",
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Color(0xFF1B5E20),
+            ),
           ),
           const Text(
             "concluído",
-            style: TextStyle(fontSize: 10, color: Colors.grey),
+            style: TextStyle(fontSize: 11, color: Color(0xFF757575)),
           ),
         ],
       ),
-      progressColor: Colors.green,
-      backgroundColor: Colors.green.withOpacity(0.1),
+      progressColor: CustomTheme.primaryColor,
+      backgroundColor: CustomTheme.primaryColor.withOpacity(0.15),
       circularStrokeCap: CircularStrokeCap.round,
       animation: true,
       animationDuration: 1000,
@@ -310,39 +329,52 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
       children: [
         const Text(
           "Saldo atual",
-          style: TextStyle(fontSize: 14, color: Colors.grey),
+          style: TextStyle(fontSize: 14, color: Color(0xFF757575), fontWeight: FontWeight.w500),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Text(
             "R\$ ${piggyBankAmount.toStringAsFixed(2)}",
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1B5E20),
+            ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Wrap(
-          spacing: 4,
+          spacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            const Text("Meta:", style: TextStyle(color: Colors.grey)),
+            const Text(
+              "Meta:",
+              style: TextStyle(color: Color(0xFF757575), fontSize: 14),
+            ),
             Text(
               "R\$ ${_goalAmount.toStringAsFixed(2)}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               overflow: TextOverflow.ellipsis,
             ),
             InkWell(
               onTap: () {
-                final TextEditingController _goalController =
+                final TextEditingController goalController =
                     TextEditingController(text: _goalAmount.toString());
                 showDialog(
                   context: context,
                   builder:
                       (context) => AlertDialog(
-                        title: const Text('Alterar Meta'),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        title: const Text(
+                          'Alterar Meta',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         content: TextField(
-                          controller: _goalController,
+                          controller: goalController,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             MoneyInputFormatter(
@@ -350,9 +382,18 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                               useSymbolPadding: true,
                             ),
                           ],
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: "Digite nova meta",
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: CustomTheme.primaryColor,
+                                width: 2,
+                              ),
+                            ),
                           ),
                         ),
                         actions: [
@@ -364,7 +405,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                             onPressed: () {
                               final newGoal = double.tryParse(
                                 toNumericString(
-                                  _goalController.text,
+                                  goalController.text,
                                   allowPeriod: true,
                                 ),
                               );
@@ -376,10 +417,14 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                                 Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: const Text(
-                                      'Meta alterada com sucesso!',
+                                    content: const Row(
+                                      children: [
+                                        Icon(Icons.check_circle, color: Colors.white),
+                                        SizedBox(width: 8),
+                                        Text('Meta alterada com sucesso!'),
+                                      ],
                                     ),
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: CustomTheme.primaryColor,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -391,8 +436,11 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
+                              backgroundColor: CustomTheme.primaryColor,
                               foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: const Text('Salvar'),
                           ),
@@ -401,14 +449,22 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: CustomTheme.primaryColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: CustomTheme.primaryColor.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: const Text(
                   "Editar",
-                  style: TextStyle(fontSize: 12, color: Colors.green),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: CustomTheme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -419,120 +475,101 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
   }
 
   Widget _buildProgressCard(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.trending_up,
-                    color: Colors.blue,
-                    size: 20,
-                  ),
+    return StandardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const IconBadge(
+                icon: Icons.trending_up,
+                iconColor: CustomTheme.secondaryColor,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Seu progresso",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: const Color(0xFF1B5E20),
+                      ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    "Seu progresso",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Stats cards with improved styling - Responsive layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // For very small screens, stack the stat cards
+              if (constraints.maxWidth < 300) {
+                return Column(
+                  children: [
+                    _buildStatCard(
+                      context,
+                      Icons.savings_outlined,
+                      CustomTheme.primaryColor,
+                      "Economias do mês",
+                      "R\$ 350,00",
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(height: 12),
+                    _buildStatCard(
+                      context,
+                      Icons.calendar_today,
+                      CustomTheme.secondaryColor,
+                      "Dias consecutivos",
+                      "7 dias",
+                    ),
+                  ],
+                );
+              } else {
+                // For larger screens, place them side by side
+                return Row(
+                  children: [
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        Icons.savings_outlined,
+                        CustomTheme.primaryColor,
+                        "Economias do mês",
+                        "R\$ 350,00",
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildStatCard(
+                        context,
+                        Icons.calendar_today,
+                        CustomTheme.secondaryColor,
+                        "Dias consecutivos",
+                        "7 dias",
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 20),
+
+          // Motivation card
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-
-            // Stats cards with improved styling - Responsive layout
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // For very small screens, stack the stat cards
-                if (constraints.maxWidth < 300) {
-                  return Column(
-                    children: [
-                      _buildStatCard(
-                        context,
-                        Icons.savings_outlined,
-                        Colors.green,
-                        "Economias do mês",
-                        "R\$ 350,00",
-                        CustomTheme.primaryColor.withOpacity(0.1),
-                        CustomTheme.primaryColor.withOpacity(0.2),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildStatCard(
-                        context,
-                        Icons.calendar_today,
-                        Colors.purple,
-                        "Dias consecutivos",
-                        "7 dias",
-                        CustomTheme.secondaryColor.withOpacity(0.1),
-                        CustomTheme.secondaryColor.withOpacity(0.2),
-                      ),
-                    ],
-                  );
-                } else {
-                  // For larger screens, place them side by side
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          Icons.savings_outlined,
-                          Colors.green,
-                          "Economias do mês",
-                          "R\$ 350,00",
-                          CustomTheme.primaryColor.withOpacity(0.1),
-                          CustomTheme.primaryColor.withOpacity(0.2),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          Icons.calendar_today,
-                          Colors.purple,
-                          "Dias consecutivos",
-                          "7 dias",
-                          CustomTheme.secondaryColor.withOpacity(0.1),
-                          CustomTheme.secondaryColor.withOpacity(0.2),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Motivation card
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const MotivationCard(),
-            ),
-          ],
-        ),
+            child: const MotivationCard(),
+          ),
+        ],
       ),
     );
   }
@@ -543,15 +580,16 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     Color iconColor,
     String title,
     String value,
-    Color backgroundColor,
-    Color borderColor,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: iconColor.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1),
+        border: Border.all(
+          color: iconColor.withOpacity(0.2),
+          width: 1.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,34 +597,44 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: iconColor.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Icon(icon, color: iconColor, size: 16),
+                child: Icon(icon, color: iconColor, size: 18),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    color: const Color(0xFF1B5E20),
+                  ),
             ),
           ),
         ],
@@ -598,91 +646,73 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+    return StandardCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const IconBadge(
+                icon: Icons.emoji_events,
+                iconColor: Colors.amber,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Suas conquistas",
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: const Color(0xFF1B5E20),
                   ),
-                  child: const Icon(
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Achievements with improved styling - Responsive layout
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Wrap(
+                spacing: 12,
+                runSpacing: 20,
+                alignment: WrapAlignment.spaceAround,
+                children: [
+                  _buildAchievementIcon(
+                    context,
+                    Icons.savings,
+                    "Primeiro",
+                    "depósito",
+                    amount > 0,
+                  ),
+                  _buildAchievementIcon(
+                    context,
                     Icons.emoji_events,
-                    color: Colors.amber,
-                    size: 20,
+                    "Meta",
+                    "atingida",
+                    amount >= 500,
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    "Suas conquistas",
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  _buildAchievementIcon(
+                    context,
+                    Icons.calendar_month,
+                    "30 dias",
+                    "seguidos",
+                    false,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Achievements with improved styling - Responsive layout
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Calculate how many achievements can fit per row
-                final double itemWidth =
-                    70; // Approximate width needed for each achievement
-                final int itemsPerRow =
-                    (constraints.maxWidth / itemWidth).floor();
-
-                // Create rows of achievements
-                return Wrap(
-                  spacing: 8,
-                  runSpacing: 16,
-                  alignment: WrapAlignment.spaceAround,
-                  children: [
-                    _buildAchievementIcon(
-                      context,
-                      Icons.savings,
-                      "Primeiro",
-                      "depósito",
-                      amount > 0,
-                    ),
-                    _buildAchievementIcon(
-                      context,
-                      Icons.emoji_events,
-                      "Meta",
-                      "atingida",
-                      amount >= 500,
-                    ),
-                    _buildAchievementIcon(
-                      context,
-                      Icons.calendar_month,
-                      "30 dias",
-                      "seguidos",
-                      false,
-                    ),
-                    _buildAchievementIcon(
-                      context,
-                      Icons.monetization_on,
-                      "R\$ 5.000",
-                      "economizados",
-                      amount >= 5000,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
+                  _buildAchievementIcon(
+                    context,
+                    Icons.monetization_on,
+                    "R\$ 5.000",
+                    "economizados",
+                    amount >= 5000,
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -695,10 +725,9 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
     bool unlocked,
   ) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return SizedBox(
-      width: 70, // Fixed width to ensure consistent sizing
+      width: 75,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -706,34 +735,34 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
             alignment: Alignment.center,
             children: [
               Container(
-                width: 50,
-                height: 50,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color:
                       unlocked
-                          ? Colors.green.withOpacity(0.1)
+                          ? CustomTheme.primaryColor.withOpacity(0.15)
                           : Colors.grey.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
               ),
               Container(
-                width: 40,
-                height: 40,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  color: unlocked ? Colors.green : Colors.grey.withOpacity(0.3),
+                  color: unlocked ? CustomTheme.primaryColor : Colors.grey.withOpacity(0.3),
                   shape: BoxShape.circle,
                   boxShadow:
                       unlocked
                           ? [
-                            BoxShadow(
-                              color: Colors.green.withOpacity(0.3),
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            ),
-                          ]
+                              BoxShadow(
+                                color: CustomTheme.primaryColor.withOpacity(0.3),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                              ),
+                            ]
                           : null,
                 ),
-                child: Icon(icon, color: Colors.white, size: 20),
+                child: Icon(icon, color: Colors.white, size: 22),
               ),
               if (unlocked)
                 Positioned(
@@ -747,21 +776,21 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
                     ),
                     child: const Icon(
                       Icons.check_circle,
-                      color: Colors.green,
-                      size: 14,
+                      color: CustomTheme.primaryColor,
+                      size: 16,
                     ),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             title,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: unlocked ? theme.textTheme.bodySmall?.color : Colors.grey,
-              fontSize: 10,
+              color: unlocked ? const Color(0xFF1B5E20) : Colors.grey,
+              fontSize: 11,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -769,7 +798,7 @@ class _PiggyBankPageState extends State<PiggyBankPage> {
             subtitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: unlocked ? theme.textTheme.bodySmall?.color : Colors.grey,
+              color: unlocked ? const Color(0xFF616161) : Colors.grey,
               fontSize: 10,
             ),
             overflow: TextOverflow.ellipsis,

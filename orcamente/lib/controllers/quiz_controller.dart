@@ -6,6 +6,7 @@ import '../repositories/user_repository.dart';
 import '../services/gemini_service.dart';
 import '../services/location_service.dart';
 import '../core/result.dart';
+import '../core/exceptions.dart';
 
 class QuizController extends ChangeNotifier {
   final UserRepository _userRepository;

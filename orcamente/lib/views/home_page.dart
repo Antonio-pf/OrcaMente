@@ -116,33 +116,73 @@ class _HomePageState extends State<HomePage> {
               ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color:
-              isDark ? CustomTheme.neutralBlack : CustomTheme.primaryVeryLight,
+          color: isDark 
+              ? CustomTheme.neutralBlack 
+              : Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withOpacity(0.05),
               offset: const Offset(0, -2),
-              blurRadius: 6,
+              blurRadius: 10,
             ),
           ],
+          border: Border(
+            top: BorderSide(
+              color: isDark 
+                  ? CustomTheme.neutralDarkGray.withOpacity(0.3)
+                  : CustomTheme.neutralLightGray,
+              width: 1,
+            ),
+          ),
         ),
         child: NavigationBar(
           selectedIndex: _selectedIndex,
           onDestinationSelected: _onItemTapped,
           height: 70,
           backgroundColor: Colors.transparent,
-          indicatorColor:
-              isDark
-                  ? CustomTheme.primaryDark.withOpacity(0.2)
-                  : CustomTheme.primaryColor.withOpacity(0.1),
+          elevation: 0,
+          indicatorColor: CustomTheme.primaryColor.withOpacity(0.15),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.attach_money_rounded),
+              icon: Icon(
+                Icons.attach_money_rounded,
+                color: _selectedIndex == 0 
+                    ? CustomTheme.primaryColor
+                    : (isDark ? CustomTheme.neutralLightGray : CustomTheme.neutralDarkGray),
+              ),
+              selectedIcon: Icon(
+                Icons.attach_money_rounded,
+                color: CustomTheme.primaryColor,
+              ),
               label: 'Controle',
             ),
-            NavigationDestination(icon: Icon(Icons.school), label: 'Educação'),
-            NavigationDestination(icon: Icon(Icons.history), label: 'Extrato'),
+            NavigationDestination(
+              icon: Icon(
+                Icons.school_outlined,
+                color: _selectedIndex == 1 
+                    ? CustomTheme.primaryColor
+                    : (isDark ? CustomTheme.neutralLightGray : CustomTheme.neutralDarkGray),
+              ),
+              selectedIcon: Icon(
+                Icons.school,
+                color: CustomTheme.primaryColor,
+              ),
+              label: 'Educação',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.history,
+                color: _selectedIndex == 2 
+                    ? CustomTheme.primaryColor
+                    : (isDark ? CustomTheme.neutralLightGray : CustomTheme.neutralDarkGray),
+              ),
+              selectedIcon: Icon(
+                Icons.history,
+                color: CustomTheme.primaryColor,
+              ),
+              label: 'Extrato',
+            ),
           ],
         ),
       ),

@@ -391,6 +391,17 @@ IMPORTANTE:
           .replaceAll('```', '')
           .trim();
 
+      // Remove trailing commas before closing braces/brackets (common AI mistake)
+      cleanResponse = cleanResponse
+          .replaceAll(RegExp(r',\s*}'), '}')
+          .replaceAll(RegExp(r',\s*]'), ']');
+
+      // Remove line breaks within string values that can break JSON parsing
+      cleanResponse = cleanResponse.replaceAllMapped(
+        RegExp(r'"[^"]*"'),
+        (match) => match.group(0)!.replaceAll('\n', ' '),
+      );
+
       print('🔧 [GeminiService] Decodificando JSON da análise...');
       final json = jsonDecode(cleanResponse) as Map<String, dynamic>;
 
