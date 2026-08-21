@@ -16,7 +16,14 @@ jobs:
           channel: 'stable'
 
       - name: Create .env
-        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > orcamente/.env
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [[ -z "$GEMINI_API_KEY" ]]; then
+            echo "GEMINI_API_KEY secret is missing or empty"
+            exit 1
+          fi
+          printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" > orcamente/.env
 
       - name: Install dependencies
         run: flutter pub get

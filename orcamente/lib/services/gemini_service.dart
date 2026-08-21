@@ -57,11 +57,15 @@ class GeminiService {
     if (error is ServerException) {
       final normalized = error.message.toLowerCase();
       final exception =
-          normalized.contains('429') || normalized.contains('quota')
-              ? AiException.quotaExceeded(originalError: error)
-              : _isTransient(error.message)
-              ? AiException.serviceUnavailable(originalError: error)
-              : AiException.generationFailed(originalError: error);
+        normalized.contains('unregistered caller') ||
+            normalized.contains('api key') ||
+            normalized.contains('identity')
+          ? AiException.invalidApiKey(originalError: error)
+          : normalized.contains('429') || normalized.contains('quota')
+          ? AiException.quotaExceeded(originalError: error)
+          : _isTransient(error.message)
+          ? AiException.serviceUnavailable(originalError: error)
+          : AiException.generationFailed(originalError: error);
       return Failure(exception.message, exception);
     }
 
