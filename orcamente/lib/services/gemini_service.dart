@@ -12,7 +12,7 @@ class GeminiService {
 
   GeminiService({required String apiKey}) : _apiKey = apiKey {
     _model = GenerativeModel(
-      model: 'gemini-flash-latest',
+      model: 'gemini-3.5-flash-lite',
       apiKey: _apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
@@ -21,7 +21,52 @@ class GeminiService {
         maxOutputTokens: 4096,
       ),
     );
-    print('✅ [GeminiService] Modelo inicializado: gemini-flash-latest');
+    print('✅ [GeminiService] Modelo inicializado: gemini-3.5-flash-lite');
+  }
+
+  Future<GenerateContentResponse> _generateContentWithRetry(
+    String prompt,
+  ) async {
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        return await _model.generateContent([Content.text(prompt)]);
+      } on ServerException catch (error) {
+        if (attempt == 1 || !_isTransient(error.message)) rethrow;
+        await Future<void>.delayed(const Duration(seconds: 2));
+      }
+    }
+
+    throw StateError('AI request retry exhausted');
+  }
+
+  bool _isTransient(String message) {
+    final normalized = message.toLowerCase();
+    return normalized.contains('503') ||
+        normalized.contains('unavailable') ||
+        normalized.contains('high demand') ||
+        normalized.contains('temporarily') ||
+        normalized.contains('overloaded');
+  }
+
+  Failure<T> _mapAiFailure<T>(Object error) {
+    if (error is InvalidApiKey) {
+      final exception = AiException.invalidApiKey(originalError: error);
+      return Failure(exception.message, exception);
+    }
+
+    if (error is ServerException) {
+      final normalized = error.message.toLowerCase();
+      final exception =
+          normalized.contains('429') || normalized.contains('quota')
+              ? AiException.quotaExceeded(originalError: error)
+              : _isTransient(error.message)
+              ? AiException.serviceUnavailable(originalError: error)
+              : AiException.generationFailed(originalError: error);
+      return Failure(exception.message, exception);
+    }
+
+    final exception = AiException.generationFailed(originalError: error);
+    return Failure(exception.message, exception);
   }
 
   /// Generate localized quiz questions based on user location
@@ -40,7 +85,7 @@ class GeminiService {
       );
 
       print('📝 [GeminiService] Prompt criado, enviando para Gemini...');
-      final response = await _model.generateContent([Content.text(prompt)]);
+      final response = await _generateContentWithRetry(prompt);
       final text = response.text;
 
       print('📥 [GeminiService] Resposta recebida do Gemini');
@@ -70,10 +115,7 @@ class GeminiService {
       return Success(questions);
     } catch (e) {
       print('❌ [GeminiService] Erro ao gerar quiz: $e');
-      return Failure(
-        'Erro ao gerar quiz com IA: $e',
-        DataException('ai-generation-error'),
-      );
+      return _mapAiFailure(e);
     }
   }
 
@@ -90,7 +132,7 @@ class GeminiService {
         weakTopics: weakTopics,
       );
 
-      final response = await _model.generateContent([Content.text(prompt)]);
+      final response = await _generateContentWithRetry(prompt);
       final text = response.text;
 
       if (text == null || text.isEmpty) {
@@ -105,10 +147,7 @@ class GeminiService {
 
       return Success(content);
     } catch (e) {
-      return Failure(
-        'Erro ao gerar conteúdo personalizado: $e',
-        DataException('ai-generation-error'),
-      );
+      return _mapAiFailure(e);
     }
   }
 
@@ -152,7 +191,7 @@ FORMATO (JSON válido, sem texto adicional):
 }
 ''';
 
-      final response = await _model.generateContent([Content.text(prompt)]);
+      final response = await _generateContentWithRetry(prompt);
       final text = response.text;
 
       if (text == null || text.isEmpty) {
@@ -166,7 +205,7 @@ FORMATO (JSON válido, sem texto adicional):
 
       return Success(questions);
     } catch (e) {
-      return Failure('Erro ao gerar quiz final: $e', DataException('ai-generation-error'));
+      return _mapAiFailure(e);
     }
   }
 
@@ -345,7 +384,7 @@ IMPORTANTE: Retorne APENAS o JSON, sem texto adicional.
       );
 
       print('📝 [GeminiService] Enviando respostas para análise...');
-      final response = await _model.generateContent([Content.text(prompt)]);
+      final response = await _generateContentWithRetry(prompt);
       final text = response.text;
 
       print('📥 [GeminiService] Análise recebida do Gemini');
@@ -374,10 +413,7 @@ IMPORTANTE: Retorne APENAS o JSON, sem texto adicional.
       return Success(analysis);
     } catch (e) {
       print('❌ [GeminiService] Erro ao analisar respostas: $e');
-      return Failure(
-        'Erro ao analisar respostas com IA: $e',
-        DataException('ai-analysis-error'),
-      );
+      return _mapAiFailure(e);
     }
   }
 
