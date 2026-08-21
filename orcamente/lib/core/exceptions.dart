@@ -82,6 +82,36 @@ class NetworkException extends AppException {
   );
 }
 
+/// AI service exceptions
+class AiException extends AppException {
+  const AiException(super.message, {super.code, super.originalError});
+
+  factory AiException.serviceUnavailable({dynamic originalError}) =>
+      AiException(
+        'O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes.',
+        code: 'ai-service-unavailable',
+        originalError: originalError,
+      );
+
+  factory AiException.invalidApiKey({dynamic originalError}) => AiException(
+    'A configuração da IA está inválida. Entre em contato com o suporte.',
+    code: 'ai-invalid-api-key',
+    originalError: originalError,
+  );
+
+  factory AiException.quotaExceeded({dynamic originalError}) => AiException(
+    'O limite de uso da IA foi atingido. Tente novamente mais tarde.',
+    code: 'ai-quota-exceeded',
+    originalError: originalError,
+  );
+
+  factory AiException.generationFailed({dynamic originalError}) => AiException(
+    'Não foi possível gerar o conteúdo com IA. Tente novamente.',
+    code: 'ai-generation-failed',
+    originalError: originalError,
+  );
+}
+
 /// Data/Firestore-related exceptions
 class DataException extends AppException {
   const DataException(super.message, {super.code, super.originalError});
