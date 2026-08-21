@@ -27,6 +27,27 @@ jobs:
           fi
           printf 'GEMINI_API_KEY=%s\n' "$GEMINI_API_KEY" > orcamente/.env
 
+      - name: Validate Gemini API from production origin
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          response_file=$(mktemp)
+          http_code=$(curl --silent --show-error --output "$response_file" --write-out '%{http_code}' \
+            --request POST \
+            'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent' \
+            --header 'Content-Type: application/json' \
+            --header "x-goog-api-key: $GEMINI_API_KEY" \
+            --header 'Referer: https://app-orcamente.web.app/' \
+            --data-raw '{"contents":[{"parts":[{"text":"Responda apenas OK."}]}]}')
+          if [[ "$http_code" != "200" ]]; then
+            echo "Gemini API validation failed with HTTP $http_code"
+            cat "$response_file"
+            rm -f "$response_file"
+            exit 1
+          fi
+          echo "Gemini API validation passed"
+          rm -f "$response_file"
+
       - name: Install dependencies
         run: flutter pub get
         working-directory: orcamente
