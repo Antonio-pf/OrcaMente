@@ -53,6 +53,8 @@ dependencies:
   geocoding: ^3.0.0
   google_generative_ai: ^0.4.6
   flutter_dotenv: ^5.1.0
+  fl_chart: ^1.2.0
+  shadcn_flutter: ^0.0.53
 
 dev_dependencies:
   flutter_test:
