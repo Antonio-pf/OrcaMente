@@ -112,6 +112,64 @@ class GeminiService {
     }
   }
 
+  /// Generate post-quiz questions based on studied topics
+  Future<Result<List<QuizQuestion>>> generatePostQuiz({
+    required List<String> studiedTopics,
+    required LocationDetails location,
+    required String profile,
+  }) async {
+    try {
+      final topicsList = studiedTopics.join(', ');
+      final prompt = '''
+Você é um especialista em educação financeira no Brasil.
+
+CONTEXTO DO USUÁRIO:
+- Perfil: $profile
+- Localização: ${location.city}, ${location.state}
+- Tópicos estudados: $topicsList
+
+TAREFA:
+Gere 5 perguntas de múltipla escolha para AVALIAR O CONHECIMENTO ADQUIRIDO sobre os tópicos estudados.
+
+REQUISITOS:
+1. Perguntas de CONHECIMENTO OBJETIVO (certo/errado), não comportamentais
+2. Cada pergunta deve ter 3 opções
+3. Apenas UMA opção correta por pergunta
+4. scores: [0, 1, 2] onde 0 = correta, 1 = parcialmente correta, 2 = errada
+   (pontuação invertida para consistência com quiz inicial)
+5. Use exemplos concretos de ${location.city}
+
+FORMATO (JSON válido, sem texto adicional):
+{
+  "questions": [
+    {
+      "id": "pq1",
+      "question": "Texto da pergunta",
+      "options": ["Opção correta", "Opção parcial", "Opção errada"],
+      "scores": [0, 1, 2]
+    }
+  ]
+}
+''';
+
+      final response = await _model.generateContent([Content.text(prompt)]);
+      final text = response.text;
+
+      if (text == null || text.isEmpty) {
+        return Failure('IA não retornou perguntas', DataException('ai-empty-response'));
+      }
+
+      final questions = _parseQuizResponse(text);
+      if (questions.isEmpty) {
+        return Failure('Não foi possível gerar o quiz final', DataException('ai-parsing-failed'));
+      }
+
+      return Success(questions);
+    } catch (e) {
+      return Failure('Erro ao gerar quiz final: $e', DataException('ai-generation-error'));
+    }
+  }
+
   /// Build prompt for quiz generation
   String _buildQuizPrompt({
     required LocationDetails location,
