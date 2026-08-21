@@ -12,6 +12,7 @@ import 'package:orcamente/controllers/home_controller.dart';
 import 'package:orcamente/controllers/expense_controller.dart';
 import 'package:orcamente/controllers/piggy_controller.dart';
 import 'package:orcamente/controllers/quiz_controller.dart';
+import 'package:orcamente/controllers/course_controller.dart';
 
 import 'package:orcamente/services/auth_service.dart';
 import 'package:orcamente/services/firestore_service.dart';
@@ -19,6 +20,7 @@ import 'package:orcamente/services/firestore_service.dart';
 import 'package:orcamente/repositories/user_repository.dart';
 import 'package:orcamente/repositories/expense_repository.dart';
 import 'package:orcamente/repositories/piggy_bank_repository.dart';
+import 'package:orcamente/repositories/course_repository.dart';
 
 import 'package:orcamente/views/about_page.dart';
 import 'package:orcamente/views/auth/forget_password.dart';
@@ -70,6 +72,17 @@ void setupDependencies() {
   getIt.registerFactory<QuizController>(
     () => QuizController(getIt<UserRepository>()),
   );
+
+  getIt.registerLazySingleton<CourseRepository>(
+    () => CourseRepository(
+      firestoreService: getIt<FirestoreService>(),
+      authService: getIt<AuthService>(),
+    ),
+  );
+
+  getIt.registerFactory<CourseController>(
+    () => CourseController(getIt<CourseRepository>()),
+  );
 }
 
 void main() async {
@@ -106,6 +119,7 @@ class AppProviders extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => getIt<ExpenseController>()),
         ChangeNotifierProvider(create: (_) => getIt<PiggyBankController>()),
         ChangeNotifierProvider(create: (_) => getIt<QuizController>()),
+        ChangeNotifierProvider(create: (_) => getIt<CourseController>()),
       ],
       child: const MyApp(),
     );

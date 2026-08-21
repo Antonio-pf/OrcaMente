@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:orcamente/controllers/course_controller.dart';
+import 'package:orcamente/services/location_service.dart';
 import '../../../styles/custom_theme.dart';
 
 class QuizResultPage extends StatelessWidget {
@@ -184,9 +186,31 @@ class QuizResultPage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setBool('quizAnswered', true);
+                    final courseController =
+                        context.read<CourseController>();
+
+                    final locationService = LocationService();
+                    final locationResult =
+                        await locationService.getUserLocation();
+
+                    final location = locationResult.when(
+                      success: (loc) => loc.details,
+                      failure: (_, __) => const LocationDetails(
+                        city: 'São Paulo',
+                        state: 'SP',
+                        country: 'Brasil',
+                        countryCode: 'BR',
+                      ),
+                    );
+
+                    await courseController.loadOrGenerateCourse(
+                      location: location,
+                      profile: profile,
+                      knowledgeLevel: knowledge,
+                      weakTopics: [profile, knowledge],
+                    );
+
+                    if (!context.mounted) return;
                     Navigator.pushReplacementNamed(context, '/home');
                   },
                   style: ElevatedButton.styleFrom(
@@ -198,7 +222,7 @@ class QuizResultPage extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Continuar',
+                    'Ver Minha Trilha',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),

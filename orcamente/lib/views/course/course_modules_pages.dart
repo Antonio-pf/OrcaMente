@@ -1,45 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:orcamente/components/widgets/custom_course_card.dart';
-import 'package:orcamente/models/course.dart';
+import 'package:provider/provider.dart';
+import 'package:orcamente/controllers/course_controller.dart';
+import 'package:orcamente/models/generated_course.dart';
 import 'package:orcamente/styles/custom_theme.dart';
+import 'package:orcamente/views/course/module_content_page.dart';
 
 class CourseModulesPage extends StatelessWidget {
-  final Course course;
+  final CourseTopic topic;
 
-  const CourseModulesPage({super.key, required this.course});
+  const CourseModulesPage({super.key, required this.topic});
 
   @override
   Widget build(BuildContext context) {
-    final modules = course.modules;
+    final controller = context.watch<CourseController>();
+    final completedIds = controller.course?.completedModuleIds ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(course.title),
+        title: Text(topic.title),
         backgroundColor: CustomTheme.primaryColor,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            mainAxisSpacing: 16,
-            childAspectRatio: 4,
-          ),
-          itemCount: modules.length,
-          itemBuilder: (context, index) {
-            final module = modules[index];
-            return CustomCourseCard(
-              title: module.title,
-              icon: Icons.menu_book,
-              onTap: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                // SnackBar(content: Text('Abrindo módulo: ${module.title}')),
-                //);
-              },
-            );
-          },
-        ),
+      body: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: topic.modules.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final module = topic.modules[index];
+          final isDone = completedIds.contains(module.id);
+
+          return Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: ListTile(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              leading: CircleAvatar(
+                backgroundColor: isDone
+                    ? CustomTheme.primaryColor
+                    : Colors.grey.shade200,
+                child: Icon(
+                  isDone ? Icons.check : Icons.menu_book,
+                  color: isDone ? Colors.white : Colors.grey,
+                ),
+              ),
+              title: Text(
+                module.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  decoration: isDone ? TextDecoration.lineThrough : null,
+                  color: isDone ? Colors.grey : null,
+                ),
+              ),
+              subtitle: Text(module.estimatedTime),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ModuleContentPage(module: module),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
