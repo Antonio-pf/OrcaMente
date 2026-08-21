@@ -16,7 +16,7 @@ class QuizController extends ChangeNotifier {
   int currentStep = 0;
   int totalScore = 0;
   final List<int> selectedOptions = [];
-  bool _isLoading = false;
+  bool _isLoading = true;
   String? _errorMessage;
   LocationDetails? _userLocation;
   String? _aiProfile;
